@@ -1,0 +1,141 @@
+<section class="bg-cyan-500 dark:bg-cyan-900 text-white p-4 rounded-lg shadow-md h-[200px] flex flex-col">
+  <h2 class="text-base font-bold pb-4">AI Recommendation Personalize</h2>
+  <ul class="list-disc pl-5">
+    <li id="ai_recommendation_value" class="mb-4 font-semibold text-sm">
+      Illnesses: Polycythemia Vera
+    </li>
+    <li id="ai_recommendation_value_" class="font-semibold text-sm">
+      Illnesses: Polycythemia Vera
+    </li>
+  </ul>
+</section>
+
+<section class="bg-cyan-500 dark:bg-cyan-900 text-white p-4 rounded-lg shadow-md h-[200px] flex flex-col">
+  <h2 class="text-base font-bold pb-4">Clinician Recommendation</h2>
+  <ul class="list-disc pl-5">
+    <li id="recommendation_clinician_value" class="mb-4 font-semibold text-sm">
+      Illnesses: Polycythemia Vera
+    </li>
+    <li id="recommendation_clinician_value_" class="font-semibold text-sm">
+      Illnesses: Polycythemia Vera
+    </li>
+  </ul>
+</section>
+
+<script>
+  let dataInput = {};
+  document.addEventListener("DOMContentLoaded", () => {
+    const socket = io("/monitoring_patient");
+
+    socket.on("connect", () => {
+      console.log("Connected to data monitoring patient bed icu {{ bed_id }}");
+      socket.emit("get_data_monitoring_patient", { icustayid: "{{ bed_id }}" });
+    });
+
+    socket.on("data_monitoring_patient", (patient_data) => {
+      console.log("Received data monitoring patient:", patient_data);
+      $.ajax({
+        type: "POST",
+        url: "/predict-sac",
+        contentType: "application/json",
+        data: JSON.stringify(patient_data),
+        success: function (response) {
+          console.log("AI Personalize", response.recommended_action_model_personalize);
+          localStorage.setItem(
+            "agentAction",
+            response.recommended_action_model_personalize.iv_dose
+          );
+          localStorage.setItem(
+            "agentAction_",
+            response.recommended_action_model_personalize.vasopressor_dose
+          );
+        },
+        error: function (error) {
+          console.error("Terjadi kesalahan:", error.responseJSON.error);
+        },
+      });
+      dataInput = {
+        gender: patient_data.gender,
+        mechvent: patient_data.mechvent,
+        max_dose_vaso: patient_data.max_dose_vaso,
+        re_admission: patient_data.re_admission,
+        age: patient_data.age,
+        Weight_kg: patient_data.Weight_kg,
+        GCS: patient_data.GCS,
+        HR: patient_data.HR,
+        SysBP: patient_data.SysBP,
+        MeanBP: patient_data.MeanBP,
+        DiaBP: patient_data.DiaBP,
+        RR: patient_data.RR,
+        Temp_C: patient_data.Temp_C,
+        FiO2_1: patient_data.FiO2_1,
+        Potassium: patient_data.Potassium,
+        Sodium: patient_data.Sodium,
+        Chloride: patient_data.Chloride,
+        Glucose: patient_data.Glucose,
+        Magnesium: patient_data.Magnesium,
+        Calcium: patient_data.Calcium,
+        Hb: patient_data.Hb,
+        WBC_count: patient_data.WBC_count,
+        Platelets_count: patient_data.Platelets_count,
+        PTT: patient_data.PTT,
+        PT: patient_data.PT,
+        Arterial_pH: patient_data.Arterial_pH,
+        paO2: patient_data.paO2,
+        paCO2: patient_data.paCO2,
+        Arterial_BE: patient_data.Arterial_BE,
+        HCO3: patient_data.HCO3,
+        Arterial_lactate: patient_data.Arterial_lactate,
+        SOFA: patient_data.SOFA,
+        SIRS: patient_data.SIRS,
+        Shock_Index: patient_data.Shock_Index,
+        PaO2_FiO2: patient_data.PaO2_FiO2,
+        cumulated_balance: patient_data.cumulated_balance,
+        SpO2: patient_data.SpO2,
+        BUN: patient_data.BUN,
+        Creatinine: patient_data.Creatinine,
+        SGOT: patient_data.SGOT,
+        SGPT: patient_data.SGPT,
+        Total_bili: patient_data.Total_bili,
+        INR: patient_data.INR,
+        input_total: patient_data.input_total,
+        input_4hourly: patient_data.input_4hourly,
+        output_total: patient_data.output_total,
+        output_4hourly: patient_data.output_4hourly,
+      };
+      
+      $.ajax({
+        type: "POST",
+        url: "/predict",
+        contentType: "application/json",
+        data: JSON.stringify(patient_data),
+        success: function (response) {
+          console.log("Clinician Action", response.recommended_action_clinician)
+          localStorage.setItem(
+            "clinicianAction",
+            response.recommended_action_clinician.iv_dose
+          );
+          localStorage.setItem(
+            "clinicianAction_",
+            response.recommended_action_clinician.vasopressor_dose
+          );
+        },
+        error: function (error) {
+          console.error("Terjadi kesalahan:", error.responseJSON.error);
+        },
+      });
+    });
+
+    setInterval(() => {
+      document.getElementById("ai_recommendation_value").innerText =
+        localStorage.getItem("agentAction");
+      document.getElementById("ai_recommendation_value_").innerText =
+        localStorage.getItem("agentAction_");
+
+      document.getElementById("recommendation_clinician_value").innerText =
+        localStorage.getItem("clinicianAction");
+      document.getElementById("recommendation_clinician_value_").innerText =
+        localStorage.getItem("clinicianAction_");
+    }, 10);
+  });
+</script>

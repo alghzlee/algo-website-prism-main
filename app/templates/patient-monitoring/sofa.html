@@ -1,0 +1,184 @@
+<!-- SOFA Score -->
+<section
+  class="bg-cyan-500 dark:bg-cyan-900 text-white p-4 rounded-lg shadow-md h-[200px] flex flex-col"
+>
+  <h2 class="text-sm font-bold text-left mb-2">
+    Overall SOFA Score: <span id="sofa_score_value">3</span>
+  </h2>
+  <div
+    class="flex-1 flex flex-col items-center justify-between overflow-hidden"
+  >
+    <!-- Grafik -->
+    <div class="flex-1 flex items-center justify-center w-full">
+      <canvas id="sofaScore" class="w-[90%] h-[70px]"></canvas>
+    </div>
+    <!-- Detail Skor -->
+    <div class="grid grid-cols-3 gap-2 text-[6px] text-center mt-1">
+      <div>
+        <span class="font-semibold">Renal:</span>
+        <span id="renal_value">3</span>
+      </div>
+      <div>
+        <span class="font-semibold">Nervous:</span>
+        <span id="nervous_value">3</span>
+      </div>
+      <div>
+        <span class="font-semibold">Cardiovascular:</span>
+        <span id="cardiovascular_value">2</span>
+      </div>
+      <div>
+        <span class="font-semibold">Liver:</span>
+        <span id="liver_value">1</span>
+      </div>
+      <div>
+        <span class="font-semibold">Respiration:</span>
+        <span id="respiration_value">2</span>
+      </div>
+      <div>
+        <span class="font-semibold">Coagulation:</span>
+        <span id="coagulation_value">3</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function initializeSofaChart() {
+      const sofaScoreCtx = document.getElementById("sofaScore").getContext("2d");
+
+      const sofaScoreChart = new Chart(sofaScoreCtx, {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 25 }, () => ""),
+          datasets: [
+            {
+              borderColor: "white",
+              borderWidth: 2,
+              fill: false,
+              tension: 0,
+              data: Array.from({ length: 25 }, () => 75),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: { display: false },
+            y: { display: false },
+          },
+          elements: {
+            point: { radius: 0 },
+          },
+        },
+      });
+
+      return { sofaScoreChart };
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const charts = initializeSofaChart();
+
+      const socket = io("/sofa_patient");
+
+      socket.on("connect", () => {
+        console.log("Connected to data sofa score patient bed icu {{ bed_id }}");
+        socket.emit("get_data_sofa_patient", { icustayid: "{{ bed_id }}" });
+      });
+
+      socket.on("data_sofa_patient", (sofa_data) => {
+        console.log("Received data sofa patient:", sofa_data);
+        charts.sofaScoreChart.data.datasets[0].data.push(sofa_data.sofa_score);
+
+        if (charts.sofaScoreChart.data.datasets[0].data.length > 25) {
+          charts.sofaScoreChart.data.datasets[0].data.shift();
+        }
+        charts.sofaScoreChart.update();
+
+        localStorage.setItem(
+          "sofaScoreData",
+          JSON.stringify(charts.sofaScoreChart.data.datasets[0].data)
+        );
+        localStorage.setItem("sofaScoreValue", sofa_data.sofa_score);
+        localStorage.setItem("renalValue", sofa_data.renal);
+        localStorage.setItem("nervousValue", sofa_data.neurological);
+        localStorage.setItem("cardiovascularValue", sofa_data.cardiovascular);
+        localStorage.setItem("liverValue", sofa_data.liver);
+        localStorage.setItem("respirationValue", sofa_data.respiratory);
+        localStorage.setItem("coagulationValue", sofa_data.coagulation);
+
+          showNotification(sofa_data.sofa_score);
+
+
+      });
+
+
+      setInterval(() => {
+        charts.sofaScoreChart.data.datasets[0].data = JSON.parse(
+          localStorage.getItem("sofaScoreData")
+        );
+        charts.sofaScoreChart.update();
+        document.getElementById("sofa_score_value").innerText =
+          localStorage.getItem("sofaScoreValue");
+        document.getElementById("renal_value").innerText =
+          localStorage.getItem("renalValue");
+        document.getElementById("nervous_value").innerText =
+          localStorage.getItem("nervousValue");
+        document.getElementById("cardiovascular_value").innerText =
+          localStorage.getItem("cardiovascularValue");
+        document.getElementById("liver_value").innerText =
+          localStorage.getItem("liverValue");
+        document.getElementById("respiration_value").innerText =
+          localStorage.getItem("respirationValue");
+        document.getElementById("coagulation_value").innerText =
+          localStorage.getItem("coagulationValue");
+      }, 10);
+    });
+
+    let audio = null;
+
+    function showNotification(sofaScore) {
+      if (sofaScore > 8) {
+        audio = new Audio('{{ url_for("static", filename="src/audio/notification.mp3") }}');
+        audio.play();
+    
+        Swal.fire({
+          title: "Emergency!",
+          text: `Patient in room ICU this in critical condition`,
+          icon: "warning",
+          showConfirmButton: false,
+          allowOutsideClick: false,
+          timer: 0,
+          customClass: {
+            title: "text-xl font-bold text-black dark:text-white",
+            content: "text-sm text-gray-700 dark:text-white",
+            popup: "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+          },
+        });
+    
+        const checkCondition = setInterval(() => {
+          if (sofaScore <= 8) {
+            clearInterval(checkCondition);
+            Swal.close();
+            if (audio) {
+              audio.pause();
+              audio.currentTime = 0;
+            }
+          }
+        }, 100);
+      } else {
+        Swal.close();
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      }
+    }
+    
+    
+</script>

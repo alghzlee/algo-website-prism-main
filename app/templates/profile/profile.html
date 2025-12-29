@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'component/header.html'%}
+
+    <script>
+      function updateProfile() {
+        let username = $("#username").val();
+        if (username === "") {
+          username = $("#username").attr("placeholder");
+        }
+        let file = $("#profile")[0].files[0];
+        let form_data = new FormData();
+        form_data.append("filePict", file);
+        form_data.append("username", username);
+        $.ajax({
+          type: "POST",
+          url: "/update-profile",
+          data: form_data,
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            Swal.fire({
+              title: "Update Successful",
+              text: response["msg"],
+              icon: "success",
+              confirmButtonText: "Oke",
+              customClass: {
+                title: "text-xl font-bold text-black dark:text-white",
+                content: "text-sm text-gray-700 dark:text-white",
+                confirmButton:
+                  "px-6 py-2 rounded-lg text-white bg-blue-500 hover:bg-blue-700 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-400 dark:focus:ring-cyan-900 dark:hover:text-black",
+                popup:
+                  "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.reload();
+              }
+            });
+          },
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div
+      class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950"
+    >
+      <div
+        data-aos="fade-down"
+        data-aos-easing="linear"
+        data-aos-duration="1000"
+        class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-900 dark:border-gray-700"
+      >
+        <form class="space-y-6" action="#">
+          <h5 class="text-xl font-medium text-gray-900 dark:text-white">
+            Profile {{ user_info.username }}
+          </h5>
+          <div class="flex flex-col items-center space-y-4">
+            <img
+              class="w-36 h-36 rounded-full object-cover cursor-pointer transition-all duration-300 filter grayscale hover:grayscale-0"
+              src="{{ url_for('static', filename=user_info.profilePict) }}"
+              alt="Profile Picture"
+            />
+          </div>
+          <div>
+            <label
+              for="profile-picture"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Upload Profile Picture
+            </label>
+            <input
+              type="file"
+              id="profile"
+              name="profile"
+              accept="image/*"
+              class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-cyan-500 cursor-pointer focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-800 dark:border-cyan-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-600 dark:focus:border-cyan-600"
+            />
+          </div>
+          <div>
+            <label
+              for="username"
+              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >Change your Username</label
+            >
+            <input
+              type="text"
+              name="username"
+              id="username"
+              class="bg-gray-50 border border-cyan-500 text-gray-900 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 dark:bg-gray-800 dark:border-cyan-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-600 dark:focus:border-cyan-600"
+              placeholder="{{ user_info.username }}"
+            />
+          </div>
+          <div class="flex justify-between gap-4">
+            <button
+              type="button"
+              onclick="updateProfile()"
+              class="w-full sm:w-auto text-white bg-cyan-500 hover:bg-cyan-600 focus:ring-4 focus:outline-none focus:ring-cyan-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900"
+            >
+              Update your Profile
+            </button>
+            <button
+              type="button"
+              onclick="window.location.href = '/'"
+              class="w-full sm:w-auto text-cyan-500 border border-cyan-500 hover:border-cyan-700 hover:text-cyan-700 focus:ring-4 focus:outline-none focus:ring-cyan-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-cyan-700 dark:hover:text-cyan-500 dark:border-cyan-700 dark:hover:border-cyan-500 dark:focus:ring-cyan-700"
+            >
+              Back to Menu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
+  </body>
+</html>

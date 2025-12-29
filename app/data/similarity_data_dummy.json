@@ -1,0 +1,535 @@
+[
+  {
+    "stay_id": "39762626",
+    "bed_id": "50100001",
+    "diagnosis": "Heart Failure",
+    "name": "Bakhtiar Joe",
+    "height": "178",
+    "weight": "72",
+    "age": "50",
+    "gender": "Male",
+    "date": "Jan 15, 2022",
+    "medichistory": [
+      "Chronic Obstructive Pulmonary Disease (COPD)",
+      "Rheumatoid arthritis",
+      "Type 1 Diabetes Mellitus"
+    ],
+    "condition": [
+      "Post-surgery recovery after heart transplant",
+      "Requires continuous monitoring in ICU"
+    ]
+  },
+  {
+    "stay_id": "39762627",
+    "bed_id": "50100002",
+    "diagnosis": "Pneumonia",
+    "name": "Jane Doe",
+    "height": "165",
+    "weight": "60",
+    "age": "45",
+    "gender": "Female",
+    "date": "Feb 18, 2022",
+    "medichistory": [
+      "Asthma",
+      "Hypertension"
+    ],
+    "condition": [
+      "Severe respiratory distress requiring mechanical ventilation",
+      "Monitoring for secondary infections"
+    ]
+  },
+  {
+    "stay_id": "39762628",
+    "bed_id": "50100003",
+    "diagnosis": "Stroke",
+    "name": "John Smith",
+    "height": "172",
+    "weight": "68",
+    "age": "65",
+    "gender": "Male",
+    "date": "Mar 12, 2022",
+    "medichistory": [
+      "Diabetes",
+      "Atrial Fibrillation"
+    ],
+    "condition": [
+      "Acute cerebrovascular event requiring constant observation",
+      "Paralysis of the right side of the body"
+    ]
+  },
+  {
+    "stay_id": "39762629",
+    "bed_id": "50100004",
+    "diagnosis": "Kidney Failure",
+    "name": "Emily Clark",
+    "height": "160",
+    "weight": "55",
+    "age": "70",
+    "gender": "Female",
+    "date": "Apr 5, 2022",
+    "medichistory": [
+      "Chronic Kidney Disease",
+      "Hypertension"
+    ],
+    "condition": [
+      "Requires dialysis support",
+      "Electrolyte imbalance management"
+    ]
+  },
+  {
+    "stay_id": "39762630",
+    "bed_id": "50100005",
+    "diagnosis": "Sepsis",
+    "name": "David Lee",
+    "height": "180",
+    "weight": "80",
+    "age": "60",
+    "gender": "Male",
+    "date": "May 15, 2022",
+    "medichistory": [
+      "Diabetes",
+      "Obesity"
+    ],
+    "condition": [
+      "Multi-organ failure due to infection",
+      "Requires vasopressor therapy"
+    ]
+  },
+  {
+    "stay_id": "39762631",
+    "bed_id": "50100006",
+    "diagnosis": "Heart Attack",
+    "name": "Sarah Johnson",
+    "height": "170",
+    "weight": "65",
+    "age": "58",
+    "gender": "Female",
+    "date": "Jun 22, 2022",
+    "medichistory": [
+      "Hypertension",
+      "High Cholesterol"
+    ],
+    "condition": [
+      "Underwent emergency angioplasty",
+      "Requires continuous ECG monitoring"
+    ]
+  },
+  {
+    "stay_id": "39762632",
+    "bed_id": "50100007",
+    "diagnosis": "Liver Cirrhosis",
+    "name": "Chris Brown",
+    "height": "175",
+    "weight": "70",
+    "age": "62",
+    "gender": "Male",
+    "date": "Jul 10, 2022",
+    "medichistory": [
+      "Hepatitis B",
+      "Alcohol Use Disorder"
+    ],
+    "condition": [
+      "Ascites requiring frequent paracentesis",
+      "Portal hypertension managemen"
+    ]
+  },
+  {
+    "stay_id": "39762633",
+    "bed_id": "50100008",
+    "diagnosis": "Severe Asthma",
+    "name": "Rachel Green",
+    "height": "162",
+    "weight": "58",
+    "age": "34",
+    "gender": "Female",
+    "date": "Aug 3, 2022",
+    "medichistory": [
+      "Asthma",
+      "Allergies"
+    ],
+    "condition": [
+      "Acute respiratory failure",
+      "Requires nebulizer treatment"
+    ]
+  },
+  {
+    "stay_id": "39762634",
+    "bed_id": "50100009",
+    "diagnosis": "Pancreatitis",
+    "name": "Tom Hanks",
+    "height": "182",
+    "weight": "78",
+    "age": "55",
+    "gender": "Male",
+    "date": "Sep 25, 2022",
+    "medichistory": [
+      "Gallbladder Disease",
+      "High Triglycerides"
+    ],
+    "condition": [
+      "Severe abdominal pain management",
+      "Fluid resuscitation therapy"
+    ]
+  },
+  {
+    "stay_id": "39762635",
+    "bed_id": "50100010",
+    "diagnosis": "COPD Exacerbation",
+    "name": "Michael Scott",
+    "height": "177",
+    "weight": "75",
+    "age": "68",
+    "gender": "Male",
+    "date": "Oct 12, 2022",
+    "medichistory": [
+      "Chronic Obstructive Pulmonary Disease (COPD)",
+      "Smoking History"
+    ],
+    "condition": [
+      "Respiratory failure requiring mechanical ventilation",
+      "Oxygen therapy management"
+    ]
+  },
+    {
+      "stay_id": "39762636",
+      "bed_id": "50100011",
+      "diagnosis": "Lung Cancer",
+      "name": "Alice Cooper",
+      "height": "168",
+      "weight": "63",
+      "age": "56",
+      "gender": "Female",
+      "date": "Nov 2, 2022",
+      "medichistory": [
+        "Chronic Bronchitis",
+        "History of Smoking"
+      ],
+      "condition": [
+        "Severe shortness of breath",
+        "Oxygen supplementation required"
+      ]
+    },
+    {
+      "stay_id": "39762637",
+      "bed_id": "50100012",
+      "diagnosis": "Diabetic Ketoacidosis",
+      "name": "Oliver Queen",
+      "height": "180",
+      "weight": "80",
+      "age": "40",
+      "gender": "Male",
+      "date": "Nov 10, 2022",
+      "medichistory": [
+        "Type 1 Diabetes Mellitus",
+        "Obesity"
+      ],
+      "condition": [
+        "Severe metabolic acidosis",
+        "Requires insulin therapy"
+      ]
+    },
+    {
+      "stay_id": "39762638",
+      "bed_id": "50100013",
+      "diagnosis": "Multiple Sclerosis",
+      "name": "Susan Sarandon",
+      "height": "162",
+      "weight": "58",
+      "age": "68",
+      "gender": "Female",
+      "date": "Dec 15, 2022",
+      "medichistory": [
+        "Multiple Sclerosis",
+        "Osteoporosis"
+      ],
+      "condition": [
+        "Severe mobility issues",
+        "Chronic pain managemen"
+      ]
+    },
+    {
+      "stay_id": "39762639",
+      "bed_id": "50100014",
+      "diagnosis": "Acute Myocardial Infarction",
+      "name": "Charlie Brown",
+      "height": "176",
+      "weight": "74",
+      "age": "59",
+      "gender": "Male",
+      "date": "Jan 1, 2023",
+      "medichistory": [
+        "Coronary Artery Disease",
+        "Hypertension"
+      ],
+      "condition": [
+        "Underwent coronary angioplasty",
+        "Requires continuous cardiac monitoring"
+      ]
+    },
+    {
+      "stay_id": "39762640",
+      "bed_id": "50100015",
+      "diagnosis": "Anemia",
+      "name": "Monica Geller",
+      "height": "163",
+      "weight": "60",
+      "age": "35",
+      "gender": "Female",
+      "date": "Jan 8, 2023",
+      "medichistory": [
+        "Iron Deficiency",
+        "Menorrhagia"
+      ],
+      "condition": [
+        "Requires iron supplementation",
+        "Fatigue managemen"
+      ]
+    },
+    {
+      "stay_id": "39762641",
+      "bed_id": "50100016",
+      "diagnosis": "Severe Burns",
+      "name": "James Dean",
+      "height": "183",
+      "weight": "79",
+      "age": "42",
+      "gender": "Male",
+      "date": "Feb 20, 2023",
+      "medichistory": [
+        "Previous burn injuries",
+        "Hypertension"
+      ],
+      "condition": [
+        "Requires skin grafts",
+        "Pain management and wound care"
+      ]
+    },
+    {
+      "stay_id": "39762642",
+      "bed_id": "50100017",
+      "diagnosis": "Rheumatic Heart Disease",
+      "name": "Kathy Bates",
+      "height": "170",
+      "weight": "75",
+      "age": "63",
+      "gender": "Female",
+      "date": "Mar 1, 2023",
+      "medichistory": [
+        "Rheumatic Fever",
+        "Valvular Heart Disease"
+      ],
+      "condition": [
+        "Requires valve replacement surgery",
+        "Close cardiac monitoring"
+      ]
+    },
+    {
+      "stay_id": "39762643",
+      "bed_id": "50100018",
+      "diagnosis": "Severe Hypothyroidism",
+      "name": "Tom Cruise",
+      "height": "172",
+      "weight": "77",
+      "age": "54",
+      "gender": "Male",
+      "date": "Mar 15, 2023",
+      "medichistory": [
+        "Hypothyroidism",
+        "Hyperlipidemia"
+      ],
+      "condition": [
+        "Requires thyroid hormone replacement",
+        "Frequent monitoring of TSH levels"
+      ]
+    },
+    {
+      "stay_id": "39762644",
+      "bed_id": "50100019",
+      "diagnosis": "Asthma Exacerbation",
+      "name": "Will Smith",
+      "height": "180",
+      "weight": "85",
+      "age": "52",
+      "gender": "Male",
+      "date": "Apr 12, 2023",
+      "medichistory": [
+        "Asthma",
+        "Allergy to Dust Mites"
+      ],
+      "condition": [
+        "Severe breathing difficulty",
+        "Needs steroid inhaler"
+      ]
+    },
+    {
+      "stay_id": "39762645",
+      "bed_id": "50100020",
+      "diagnosis": "Cerebral Hemorrhage",
+      "name": "Ariana Grande",
+      "height": "155",
+      "weight": "50",
+      "age": "29",
+      "gender": "Female",
+      "date": "May 10, 2023",
+      "medichistory": [
+        "Hypertension",
+        "Obesity"
+      ],
+      "condition": [
+        "Requires craniotomy surgery",
+        "Intensive neurological care"
+      ]
+    },
+    {
+      "stay_id": "39762646",
+      "bed_id": "50100021",
+      "diagnosis": "Peptic Ulcer Disease",
+      "name": "Brad Pitt",
+      "height": "180",
+      "weight": "82",
+      "age": "59",
+      "gender": "Male",
+      "date": "Jun 1, 2023",
+      "medichistory": [
+        "Gastritis",
+        "Smoking History"
+      ],
+      "condition": [
+        "Severe abdominal pain management",
+        "Medication for ulcer healing"
+      ]
+    },
+    {
+      "stay_id": "39762647",
+      "bed_id": "50100022",
+      "diagnosis": "Hepatitis C",
+      "name": "Angelina Jolie",
+      "height": "160",
+      "weight": "58",
+      "age": "48",
+      "gender": "Female",
+      "date": "Jul 15, 2023",
+      "medichistory": [
+        "Liver Disease",
+        "Alcohol Use Disorder"
+      ],
+      "condition": [
+        "Requires antiviral treatment",
+        "Monitoring for liver failure"
+      ]
+    },
+    {
+      "stay_id": "39762648",
+      "bed_id": "50100023",
+      "diagnosis": "Osteoarthritis",
+      "name": "Matt Damon",
+      "height": "175",
+      "weight": "76",
+      "age": "61",
+      "gender": "Male",
+      "date": "Aug 20, 2023",
+      "medichistory": [
+        "Joint Inflammation",
+        "Previous Fracture"
+      ],
+      "condition": [
+        "Chronic joint pain management",
+        "Physical therapy and anti-inflammatory drugs"
+      ]
+    },
+    {
+      "stay_id": "39762649",
+      "bed_id": "50100024",
+      "diagnosis": "Chronic Sinusitis",
+      "name": "Jennifer Lawrence",
+      "height": "168",
+      "weight": "65",
+      "age": "34",
+      "gender": "Female",
+      "date": "Sep 8, 2023",
+      "medichistory": [
+        "Frequent Sinus Infections",
+        "Allergies"
+      ],
+      "condition": [
+        "Requires nasal corticosteroids",
+        "Frequent decongestant use"
+      ]
+    },
+    {
+      "stay_id": "39762650",
+      "bed_id": "50100025",
+      "diagnosis": "Chronic Fatigue Syndrome",
+      "name": "Leonardo DiCaprio",
+      "height": "177",
+      "weight": "72",
+      "age": "49",
+      "gender": "Male",
+      "date": "Oct 10, 2023",
+      "medichistory": [
+        "Chronic Fatigue",
+        "Sleep Disorders"
+      ],
+      "condition": [
+        "Constant fatigue requiring rest",
+        "Management with lifestyle changes"
+      ]
+    },
+    {
+      "stay_id": "39762651",
+      "bed_id": "50100026",
+      "diagnosis": "Epilepsy",
+      "name": "Keanu Reeves",
+      "height": "179",
+      "weight": "80",
+      "age": "58",
+      "gender": "Male",
+      "date": "Oct 25, 2023",
+      "medichistory": [
+        "Seizure Disorder",
+        "Migraine"
+      ],
+      "condition": [
+        "Requires anticonvulsant medication",
+        "Monitoring for seizure activity"
+      ]
+    },
+    {
+      "stay_id": "39762652",
+      "bed_id": "50100027",
+      "diagnosis": "Chronic Migraine",
+      "name": "Emma Watson",
+      "height": "165",
+      "weight": "58",
+      "age": "34",
+      "gender": "Female",
+      "date": "Nov 5, 2023",
+      "medichistory": [
+        "Frequent Migraines",
+        "Visual Disturbances"
+      ],
+      "condition": [
+        "Requires preventive migraine medication",
+        "Biofeedback therapy"
+      ]
+    },
+    {
+      "stay_id": "39762653",
+      "bed_id": "50100028",
+      "diagnosis": "Gout",
+      "name": "Bruce Willis",
+      "height": "176",
+      "weight": "79",
+      "age": "68",
+      "gender": "Male",
+      "date": "Nov 25, 2023",
+      "medichistory": [
+        "Arthritis",
+        "Hyperuricemia"
+      ],
+      "condition": [
+        "Severe joint pain management",
+        "Medication for uric acid reduction"
+      ]
+    }
+]

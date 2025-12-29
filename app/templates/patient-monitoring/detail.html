@@ -1,0 +1,84 @@
+<!-- Patient Details -->
+<section
+  class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg"
+>
+  <h2 class="text-lg font-bold dark:text-white mb-4">Patient Details</h2>
+  <div class="flex items-center pt-1">
+    <i
+      class="mdi mdi-account text-2xl transition duration-75 text-cyan-500 mr-2"
+    ></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="name_value">
+      Adam Gilchrist
+    </p>
+  </div>
+  <div class="flex items-center pt-1">
+    <i
+      class="mdi mdi-run-fast text-2xl transition duration-75 text-cyan-500 mr-2"
+    ></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="age_value">
+      123 Kings Road Brisbane
+    </p>
+  </div>
+  <div class="flex items-center pt-1">
+    <i
+      class="mdi mdi-human-male-height text-2xl transition duration-75 text-cyan-500 mr-2"
+    ></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="body_period_vale">
+      Tue 3 Mar 2022
+    </p>
+  </div>
+  <img
+    src="{{url_for('static', filename='src/images/assets/x-ray.png')}}"
+    alt="Patient Body"
+    class="mx-auto my-4 h-75 mb-5 w-70"
+  />
+
+  <div class="flex space-x-4 pt-4">
+    <button
+      class="w-auto text-sm py-2 px-2 rounded-lg text-white bg-cyan-500 transition duration-200 cursor-not-allowed"
+    >
+      CHEST X-RAY
+    </button>
+    <button
+      class="w-auto text-sm py-2 px-2 rounded-lg text-white bg-cyan-500 transition duration-200 cursor-not-allowed"
+    >
+      MRI
+    </button>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const socket = io("/detail_patient");
+
+    socket.on("connect", () => {
+      console.log("Connected to detail patient bed icu {{ bed_id }}");
+      socket.emit("get_detail_patient", { icustayid: "{{ bed_id }}" });
+    });
+
+    socket.on("detail_patient_data", (patient_data) => {
+      console.log("Received patient data:", patient_data);
+      localStorage.setItem(
+          "name",
+          patient_data.name
+        );
+        localStorage.setItem(
+          "age",
+          patient_data.age
+        );
+        localStorage.setItem(
+          "body_period",
+          patient_data.body_period
+        );
+    });
+
+    setInterval(() => {
+      document.getElementById("name_value").innerText =
+        localStorage.getItem("name");
+      document.getElementById("age_value").innerText =
+        localStorage.getItem("age");
+      document.getElementById("body_period_vale").innerText =
+        localStorage.getItem("body_period");
+    }, 10);
+  });
+</script>

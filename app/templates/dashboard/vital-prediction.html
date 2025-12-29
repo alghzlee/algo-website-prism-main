@@ -1,0 +1,397 @@
+<html>
+  <head>
+    {% include 'component/header.html'%}
+  </head>
+  <body class="dark:bg-gray-950 bg-gray-100">
+    {% include 'component/navbar.html'%}
+
+    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
+      <!-- Patient Detail -->
+      {% include 'patient-monitoring/detail.html'%}
+
+      <!-- Vital -->
+      {% include 'patient-monitoring/vital.html'%}
+
+      <!-- Prediction -->
+      <section
+        class="col-span-1 md:col-span-6 lg:col-span-4 bg-white dark:bg-gray-950 p-4 rounded-lg"
+      >
+        <!-- Heart Rate Predict-->
+        <div class="mb-4">
+          <p class="text-[12px] mt-2 mb-6 text-gray-900 dark:text-gray-200">
+            HEART RATE
+          </p>
+          <div class="flex items-center">
+            <!-- Grafik -->
+            <div class="flex-grow">
+              <canvas
+                id="heartRatePredict"
+                class="w-full h-[130px] max-h-[130px]"
+              ></canvas>
+            </div>
+            <div class="pl-7 flex flex-col items-center justify-center ml-4">
+              <i class="mdi mdi-heart-pulse text-5xl text-red-500"></i>
+              <div class="flex items-baseline mt-2">
+                <p
+                  class="text-4xl font-bold text-black dark:text-white"
+                  id="heart_rate_predict_value"
+                >
+                  60
+                </p>
+                <p class="text-sm text-black dark:text-white ml-1">bpm</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Oxygen Saturation Predict -->
+        <div class="mb-4">
+          <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
+            OXYGEN SATURATION
+          </p>
+          <div class="flex items-center">
+            <!-- Grafik -->
+            <div class="flex-grow">
+              <canvas
+                id="oxygenSaturationPredict"
+                class="w-full h-[130px] max-h-[130px]"
+              ></canvas>
+            </div>
+            <div class="pl-7 flex flex-col items-center justify-center ml-4">
+              <i class="mdi mdi-heart-plus-outline text-5xl text-red-500"></i>
+              <div class="flex items-baseline mt-2">
+                <p
+                  class="text-4xl font-bold text-black dark:text-white"
+                  id="oxygen_saturation_predict_value"
+                >
+                  60
+                </p>
+                <p class="text-sm text-black dark:text-white ml-1">%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Respiratory Rate Predict -->
+        <div class="mb-4">
+          <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
+            RESPIRATORY RATE
+          </p>
+          <div class="flex items-center">
+            <!-- Grafik -->
+            <div class="flex-grow">
+              <canvas
+                id="respiratoryRatePredict"
+                class="w-full h-[130px] max-h-[130px]"
+              ></canvas>
+            </div>
+            <div class="pl-7 flex flex-col items-center justify-center ml-4">
+              <i class="mdi mdi-lungs text-5xl text-red-500"></i>
+              <div class="flex items-baseline mt-2">
+                <p
+                  class="text-4xl font-bold text-black dark:text-white"
+                  id="respiratory_rate_predict_value"
+                >
+                  60
+                </p>
+                <p class="text-sm text-black dark:text-white ml-1">rpm</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
+      <!-- History -->
+      {% include 'patient-monitoring/history.html'%}
+
+      <!-- Blood Pressure -->
+      {% include 'patient-monitoring/blood-presurre.html'%}
+
+      <!-- SOFA Score -->
+      {% include 'patient-monitoring/sofa.html'%}
+
+      <!-- Similar -->
+      {% include 'patient-monitoring/similar.html'%}
+
+      <!-- Recommendation -->
+      {% include 'patient-monitoring/treatment-recommendation.html'%}
+    </footer>
+  </body>
+</html>
+
+<script>
+  let timePredict = localStorage.getItem("global_time_predict");
+
+  function generateHeartRatePredictWaveform(t) {
+    const baseline = 75;
+    const amplitude = 5;
+    const frequency = 0.1;
+    const smoothFactor = 0.02;
+    const noise = Math.random() * 0.5 - 0.25;
+
+    const heartRate =
+      baseline + amplitude * Math.sin(frequency * t) + noise;
+    const smoothHeartRate =
+      heartRate * (1 - smoothFactor) + baseline * smoothFactor;
+    return Math.min(Math.max(smoothHeartRate, 50), 120);
+  }
+
+  function generateOxygenSaturationPredictWaveform(t) {
+    const amplitude = 2;
+    const baseline = 98;
+    const frequency = 0.2;
+    const noise = Math.random() * 0.5 - 0.25;
+    return (
+      baseline + amplitude * Math.sin(frequency * t + Math.PI / 2) + noise
+    );
+  }
+
+  function generateRespiratoryRatePredictWaveform(t) {
+    const amplitude = 2;
+    const baseline = 20;
+    const frequency = 0.1;
+    const noise = Math.random() * 1 - 0.5;
+    return baseline + amplitude * Math.sin(frequency * t) + noise;
+  }
+  function initializePredictChart() {
+    const heartRatePredictCtx = document
+      .getElementById("heartRatePredict")
+      .getContext("2d");
+    const oxygenSaturationPredictCtx = document
+      .getElementById("oxygenSaturationPredict")
+      .getContext("2d");
+    const respiratoryPredictRateCtx = document
+      .getElementById("respiratoryRatePredict")
+      .getContext("2d");
+
+    const heartRatePredictChart = new Chart(heartRatePredictCtx, {
+      type: "line",
+      data: {
+        labels: Array.from({ length: 300 }, () => ""),
+        datasets: [
+          {
+            borderColor: "#F09319",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            data: Array.from({ length: 300 }, () => 75),
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: {
+          point: { radius: 0 },
+        },
+      },
+    });
+
+    const oxygenSaturationPredictChart = new Chart(
+      oxygenSaturationPredictCtx,
+      {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 300 }, () => ""),
+          datasets: [
+            {
+              borderColor: "#FFE31A",
+              borderWidth: 2,
+              fill: false,
+              tension: 0.4,
+              data: Array.from({ length: 300 }, () => 98),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: { display: false },
+            y: { display: false },
+          },
+          elements: {
+            point: { radius: 0 },
+          },
+        },
+      }
+    );
+
+    const respiratoryRatePredictChart = new Chart(
+      respiratoryPredictRateCtx,
+      {
+        type: "line",
+        data: {
+          labels: Array.from({ length: 300 }, () => ""),
+          datasets: [
+            {
+              borderColor: "#4CCD99",
+              borderWidth: 2,
+              fill: false,
+              tension: 0.4,
+              data: Array.from({ length: 300 }, () => 20),
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            x: { display: false },
+            y: { display: false },
+          },
+          elements: {
+            point: { radius: 0 },
+          },
+        },
+      }
+    );
+
+    return {
+      heartRatePredictChart,
+      oxygenSaturationPredictChart,
+      respiratoryRatePredictChart,
+    };
+  }
+
+  function updatePredictCharts(
+    charts,
+    hr_predict,
+    rr_predict,
+    oxygen_saturation_predict
+  ) {
+    charts.heartRatePredictChart.data.datasets[0].data.push(hr_predict);
+    if (charts.heartRatePredictChart.data.datasets[0].data.length > 300) {
+      charts.heartRatePredictChart.data.datasets[0].data.shift();
+    }
+    charts.heartRatePredictChart.update();
+
+    charts.oxygenSaturationPredictChart.data.datasets[0].data.push(
+      oxygen_saturation_predict
+    );
+    if (
+      charts.oxygenSaturationPredictChart.data.datasets[0].data.length >
+      300
+    ) {
+      charts.oxygenSaturationPredictChart.data.datasets[0].data.shift();
+    }
+    charts.oxygenSaturationPredictChart.update();
+
+    charts.respiratoryRatePredictChart.data.datasets[0].data.push(
+      rr_predict
+    );
+    if (
+      charts.respiratoryRatePredictChart.data.datasets[0].data.length >
+      300
+    ) {
+      charts.respiratoryRatePredictChart.data.datasets[0].data.shift();
+    }
+    charts.respiratoryRatePredictChart.update();
+
+    localStorage.setItem(
+      "heartRatePredictData",
+      JSON.stringify(charts.heartRatePredictChart.data.datasets[0].data)
+    );
+    localStorage.setItem(
+      "oxygenSaturationPredictData",
+      JSON.stringify(
+        charts.oxygenSaturationPredictChart.data.datasets[0].data
+      )
+    );
+    localStorage.setItem(
+      "respiratoryRatePredictData",
+      JSON.stringify(
+        charts.respiratoryRatePredictChart.data.datasets[0].data
+      )
+    );
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const charts = initializePredictChart();
+
+    if (localStorage.getItem("heartRatePredictData")) {
+      charts.heartRatePredictChart.data.datasets[0].data = JSON.parse(
+        localStorage.getItem("heartRatePredictData")
+      );
+      charts.heartRatePredictChart.update();
+    }
+    if (localStorage.getItem("oxygenSaturationPredictData")) {
+      charts.oxygenSaturationPredictChart.data.datasets[0].data =
+        JSON.parse(localStorage.getItem("oxygenSaturationPredictData"));
+      charts.oxygenSaturationPredictChart.update();
+    }
+    if (localStorage.getItem("respiratoryRatePredictData")) {
+      charts.respiratoryRatePredictChart.data.datasets[0].data =
+        JSON.parse(localStorage.getItem("respiratoryRatePredictData"));
+      charts.respiratoryRatePredictChart.update();
+    }
+
+    const socket = io("/vital_patient_prediction");
+
+    socket.on("connect", () => {
+      console.log("Connected to data vital prediction bed icu {{ bed_id }}");
+      socket.emit("get_data_prediction_vital_patient");
+    });
+
+    socket.on("data_prediction_vital_patient", (prediction_data) => {
+      console.log("Received data vital prediction:", prediction_data);
+
+      localStorage.setItem(
+        "heartRatePredictValue",
+        Math.round(prediction_data.heart_rate)
+      );
+      localStorage.setItem(
+        "oxygenSaturationPredictValue",
+        Math.round(prediction_data.oxygen_saturation)
+      );
+      localStorage.setItem(
+        "respiratoryRatePredictValue",
+        Math.round(prediction_data.respiratory_rate)
+      );
+      localStorage.setItem(
+        "global_time_predict",
+        Math.round(timePredict)
+      );
+    });
+
+    setInterval(() => {
+      const hr_predict = generateHeartRatePredictWaveform(timePredict);
+      const rr_predict =
+        generateRespiratoryRatePredictWaveform(timePredict);
+      const oxygen_saturation_predict =
+        generateOxygenSaturationPredictWaveform(timePredict);
+      updatePredictCharts(
+        charts,
+        hr_predict,
+        rr_predict,
+        oxygen_saturation_predict
+      );
+      document.getElementById("heart_rate_predict_value").innerText =
+        localStorage.getItem("heartRatePredictValue");
+
+      document.getElementById(
+        "oxygen_saturation_predict_value"
+      ).innerText = localStorage.getItem("oxygenSaturationPredictValue");
+
+      document.getElementById(
+        "respiratory_rate_predict_value"
+      ).innerText = localStorage.getItem("respiratoryRatePredictValue");
+      timePredict++;
+    }, 100);
+  });
+</script>

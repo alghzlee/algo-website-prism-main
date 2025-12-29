@@ -1,0 +1,84 @@
+<html>
+
+<head>
+  {% include 'component/header.html'%}
+</head>
+
+<body class="dark:bg-gray-950 bg-gray-200">
+  {% include 'component/navbar.html'%}
+
+  <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
+    <!-- Patient Detail -->
+    {% include 'patient-monitoring/detail.html'%}
+
+    <!-- Vital -->
+    {% include 'patient-monitoring/vital.html'%}
+
+    <!-- Treatment Recommendation -->
+    <section class="col-span-1 md:col-span-6 gap-8 lg:col-span-4 bg-slate-300 dark:bg-slate-800 p-4 rounded-lg">
+      <h2 class="text-2xl font-bold mb-6 text-black dark:text-white p-4">
+        Treatment Recommendation
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-6 p-4">
+        <!-- Prediction Personalize -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-xl text-black dark:text-white">
+          <h3 class="text-xl font-semibold text-black dark:text-white mb-4">
+            Prediction Personalize
+          </h3>
+          <ul class="list-disc pl-5 mt-6">
+            <li id="ai_recommendation_personalize" class="mb-4 font-semibold text-sm">Illnesses: Polycythemia Vera</li>
+            <li id="ai_recommendation_personalize_" class="font-semibold text-sm">Illnesses: Polycythemia Vera</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mt-4 p-4">
+        <!-- Recommended Treatments -->
+        <div class="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-xl text-black dark:text-white">
+          <h3 class="text-xl font-semibold text-black dark:text-white mb-4">
+            Clinician Action
+          </h3>
+          <ul class="list-disc pl-5 mt-6">
+            <li id="ai_recommendation_clinician" class="mb-4 font-semibold text-sm">Illnesses: Polycythemia Vera</li>
+            <li id="ai_recommendation_clinician_" class="font-semibold text-sm">Illnesses: Polycythemia Vera</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
+    <!-- History -->
+    {% include 'patient-monitoring/history.html'%}
+
+    <!-- Blood Pressure -->
+    {% include 'patient-monitoring/blood-presurre.html'%}
+
+    <!-- SOFA Score -->
+    {% include 'patient-monitoring/sofa.html'%}
+
+    <!-- Similar -->
+    {% include 'patient-monitoring/similar.html'%}
+
+    <!-- Recommendation -->
+    {% include 'patient-monitoring/treatment-recommendation.html'%}
+  </footer>
+</body>
+
+</html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    setInterval(() => {
+      document.getElementById("ai_recommendation_personalize").innerText =
+        localStorage.getItem("agentAction");
+      document.getElementById("ai_recommendation_personalize_").innerText =
+        localStorage.getItem("agentAction_");
+
+      document.getElementById("ai_recommendation_clinician").innerText =
+        localStorage.getItem("clinicianAction");
+      document.getElementById("ai_recommendation_clinician_").innerText =
+        localStorage.getItem("clinicianAction_");
+    }, 10);
+  });
+</script>

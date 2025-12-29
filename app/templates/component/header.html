@@ -1,0 +1,76 @@
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRISM</title>
+<!-- CSS -->
+<link
+  href="{{ url_for('static', filename='dist/css/output.css') }}"
+  rel="stylesheet"
+/>
+<!-- daisyui -->
+<link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Flowbite -->
+<script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+
+<!-- Material Design Icons CDN -->
+<link
+  href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css"
+  rel="stylesheet"
+/>
+<!-- Chart.js-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!--AOS Library-->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+<!-- Tambahkan JavaScript untuk memanipulasi tema dengan jQuery -->
+<script>
+  $(document).ready(function () {
+    function setTheme() {
+      const currentTheme = localStorage.getItem("color-theme");
+
+      if (
+        currentTheme === "dark" ||
+        (currentTheme === null &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        $("html").addClass("dark");
+        $("#toggle-circle").addClass("translate-x-8"); 
+        $("#sun-icon").removeClass("hidden").addClass("text-blue-500");
+        $("#moon-icon").addClass("hidden").removeClass("text-blue-500");
+      } else {
+        $("html").removeClass("dark");
+        $("#toggle-circle").removeClass("translate-x-8"); 
+        $("#moon-icon").removeClass("hidden").addClass("text-blue-500");
+        $("#sun-icon").addClass("hidden").removeClass("text-blue-500");
+      }
+    }
+
+    setTheme();
+
+    $("#toggle-container").click(function () {
+      $("html").toggleClass("dark");
+      $("#toggle-circle").toggleClass("translate-x-8"); 
+
+      if ($("html").hasClass("dark")) {
+        localStorage.setItem("color-theme", "dark");
+        $("#sun-icon").removeClass("hidden").addClass("text-blue-500");
+        $("#moon-icon").addClass("hidden").removeClass("text-blue-500");
+      } else {
+        localStorage.setItem("color-theme", "light");
+        $("#moon-icon").removeClass("hidden").addClass("text-blue-500");
+        $("#sun-icon").addClass("hidden").removeClass("text-blue-500");
+      }
+    });
+  });
+</script>
+<style>
+  .translate-x-8 {
+    transform: translateX(2rem);
+  }
+</style>

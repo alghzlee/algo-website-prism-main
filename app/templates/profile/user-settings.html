@@ -1,0 +1,374 @@
+<html>
+
+<head>
+  {% include 'component/header.html'%}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let time = 0;
+      localStorage.setItem("global_time_predict", Math.round(time));
+      localStorage.setItem("global_time", Math.round(time));
+
+    });
+
+    function logout() {
+      $.ajax({
+        url: "/logout",
+        type: "DELETE",
+        success: function (response) {
+          document.cookie =
+            "mytoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+          window.location.href = "/";
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+    }
+  </script>
+</head>
+
+<body class="dark:bg-gray-950 bg-gray-100">
+  <nav class="bg-white dark:bg-gray-900 border-b border-cyan-300 dark:border-cyan-800">
+    <div class="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between p-4">
+      <!-- Logo -->
+      <a href="/" class="flex items-center">
+        <i class="mdi mdi-hospital-box text-3xl mr-3 text-cyan-500"></i>
+        <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
+          PRISM
+        </span>
+      </a>
+
+      <!-- Mobile menu toggle button -->
+      <button data-collapse-toggle="navbar-default" type="button"
+        class="inline-flex items-center p-2 w-10 h-10 text-cyan-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        aria-controls="navbar-default" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M3 5h14a1 1 0 110 2H3a1 1 0 010-2zm0 4h14a1 1 0 110 2H3a1 1 0 010-2zm0 4h14a1 1 0 110 2H3a1 1 0 010-2z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      <!-- Navbar items -->
+      <div class="hidden w-full md:flex md:w-auto" id="navbar-default">
+        <ul class="flex flex-col md:flex-row items-start gap-6 md:gap-4 md:space-x-8 mt-4 md:mt-0">
+          <!-- Dark Mode Toggle -->
+          <li>
+            <div id="toggle-container"
+              class="relative w-16 h-8 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center p-1 cursor-pointer transition-all duration-300">
+              <div id="toggle-circle"
+                class="w-6 h-6 bg-cyan-500 rounded-full shadow-md transform transition-all duration-300">
+                <!-- Add icon inside the circle -->
+                <svg id="toggle-icon" class="w-5 h-5 m-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path id="sun-icon"
+                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                    class="hidden"></path>
+                  <path id="moon-icon" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+                    class="hidden"></path>
+                </svg>
+              </div>
+            </div>
+          </li>
+
+          <!-- Notifications -->
+          <li>
+            <button id="dropdownNotificationButton" data-dropdown-toggle="dropdownNotification"
+              class="relative inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white dark:text-gray-400">
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                <path
+                  d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
+              </svg>
+              <div
+                class="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full -top-0.5 start-2.5 dark:border-gray-900">
+              </div>
+            </button>
+            <div class="flex items-center ms-1">
+              <!-- Dropdown menu -->
+              <div id="dropdownNotification"
+                class="z-20 hidden w-full max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-950 dark:divide-gray-700"
+                aria-labelledby="dropdownNotificationButton">
+                <div
+                  class="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-gray-950 dark:text-white">
+                  Notifications
+                </div>
+                <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                  <a href="#" class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-900">
+                    <div class="flex-shrink-0">
+                      <img class="rounded-full w-11 h-11" src="{{ url_for('static', filename=user_info.profilePict) }}"
+                        alt="Jese image" />
+                      <div
+                        class="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-blue-600 border border-white rounded-full dark:border-gray-800">
+                        <svg class="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                          fill="currentColor" viewBox="0 0 18 18">
+                          <path
+                            d="M1 18h16a1 1 0 0 0 1-1v-6h-4.439a.99.99 0 0 0-.908.6 3.978 3.978 0 0 1-7.306 0 .99.99 0 0 0-.908-.6H0v6a1 1 0 0 0 1 1Z" />
+                          <path
+                            d="M4.439 9a2.99 2.99 0 0 1 2.742 1.8 1.977 1.977 0 0 0 3.638 0A2.99 2.99 0 0 1 13.561 9H17.8L15.977.783A1 1 0 0 0 15 0H3a1 1 0 0 0-.977.783L.2 9h4.239Z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="w-full ps-3">
+                      <div class="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
+                        New message from
+                        <span class="font-semibold text-gray-900 dark:text-white">Jese Leos</span>: "Hey, what's up? All
+                        set for the presentation?"
+                      </div>
+                      <div class="text-xs text-blue-600 dark:text-blue-500">
+                        a few moments ago
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <a href="#"
+                  class="block py-2 text-sm font-medium text-center text-gray-900 rounded-b-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-900 dark:text-white">
+                  <div class="inline-flex items-center">
+                    <svg class="w-4 h-4 me-2 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                      <path
+                        d="M10 0C4.612 0 0 5.336 0 7c0 1.742 3.546 7 10 7 6.454 0 10-5.258 10-7 0-1.664-4.612-7-10-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" />
+                    </svg>
+                    View all
+                  </div>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <!-- User Dropdown -->
+          <li>
+            <button id="dropdownAvatarNameButton" data-dropdown-toggle="dropdownAvatarName"
+              class="flex items-center text-sm font-medium text-gray-900 dark:text-white">
+              <img class="w-8 h-8 rounded-full" src="{{ url_for('static', filename=user_info.profilePict) }}"
+                alt="Profile Picture" />
+              <span class="ms-2 hover:text-cyan-500">{{ user_info.username }}</span>
+              <!-- Icon Dropdown -->
+              <svg class="w-4 h-4 ms-2 hover:text-cyan-500" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="dropdownAvatarName"
+              class="hidden z-10 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-950 dark:divide-gray-600">
+              <div class="px-4 py-3">
+                <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ user_info.email }}</span>
+              </div>
+              <ul class="py-2">
+                <li>
+                  <a href="/profile"
+                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                    <i class="mdi mdi-account text-lg me-2"></i>My Profile</a>
+                </li>
+              </ul>
+              <ul class="py-2">
+                <li>
+                  <a href="/user-settings"
+                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                    <i class="mdi mdi-account text-lg me-2"></i>User Settings</a>
+                </li>
+              </ul>
+              <div class="py-2">
+                <button type="button" onclick="logout()"
+                  class="flex items-center px-4 w-full py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                  <i class="mdi mdi-logout text-lg me-2"></i>
+                  Logout
+                </button>
+              </div>
+              <div class="py-2">
+                <a href="/sign-up"
+                  class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                  <i class="mdi mdi-account-plus-outline text-lg me-2"></i>
+                  Sign Up
+                </a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="p-4 border-2 border-gray-100 border-dashed rounded-lg dark:border-gray-950 mt-6">
+    <div class="flex justify-between items-center mb-6">
+      <!-- Tab Bar -->
+      <!-- Search Bar -->
+      <div class="w-64 sm:w-72 md:w-80 -mt-8">
+        <form class="max-w-md mx-auto">
+          <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search"
+              class="block w-full p-3 pl-10 text-sm text-gray-900 border border-blue-500 rounded-lg bg-gray-50 focus:ring-blue-700 focus:border-blue-700 dark:bg-gray-900 dark:border-cyan-900 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-400 dark:focus:border-cyan-400"
+              placeholder="Search Mockups, Logos..." required />
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="flex space-x-2">
+      <!-- Card Detail -->
+      <div id="profileCard"
+        class="w-1/3 card hidden bg-base-100 w-100 shadow-sm transform transition-all dark:bg-gray-900 shadow-xl rounded-2xl p-6 border border-gray-200 dark:border-gray-700 ease-in-out duration-500 opacity-0 shadow-lg rounded-lg p-6">
+        <figure>
+          <img id="cardProfileImage" src="" alt="Profile Picture"
+            class="w-24 h-24 object-cover rounded-full mx-auto mb-4 border-4 border-blue-500" />
+        </figure>
+        <div class="card-body relative">
+          <h2 class="text-2xl font-extrabold text-center drop-shadow-lg mb-4 text-white">
+            User Detail
+          </h2>
+          <p class="mb-2 text-white"><strong>Name:</strong> <span id="cardName"></span></p>
+          <p class="mb-2 text-white"><strong>Email:</strong> <span id="cardEmail"></span></p>
+          <p class="mb-2 text-white"><strong>Role:</strong> <span id="cardRole"></span></p>
+          <p class="mb-2 text-white"><strong>Address:</strong> <span id="cardAddress"></span></p>
+          <div class="card-actions justify-end">
+            <button onclick="hideCard()"
+              class="absolute top-2 right-2 text-gray-400 hover:text-black dark text-xl font-bold">
+              &times;
+            </button>
+            <!-- Card Delete Button -->
+            <button id="cardDeleteBtn" onclick="deleteCardUser()" style="background-color: red !important; color: white"
+              class="py-2 px-4 rounded-lg shadow">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="flex w-full gap-4 transition-all duration-500 ease-in-out" id="userLayout">
+        <!-- Table User -->
+        <div id="tableContainer" class="transition-all duration-500 ease-in-out w-full">
+          <div
+            class="overflow-x-auto text-white w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-900 dark:border-gray-700">
+            <table class="table table-xs text-white w-full">
+              <thead class="text-white">
+                <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in users %}
+                <tr class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 text-black dark:text-white"
+                  data-name="{{ user.get('username', '') }}" data-email="{{ user.get('email', '') }}"
+                  data-role="{{ user.get('role', '') }}" data-address="{{ user.get('address', '') }}"
+                  data-profile="{{ url_for('static', filename=user.get('profilePict', 'src/images/profiles/default.png')) }}">
+                  <th>{{ loop.index }}</th>
+                  <td>{{ user.get('username', 'N/A') }}</td>
+                  <td>{{ user.get('email', 'N/A') }}</td>
+                  <td>{{ user.get('role', 'N/A') }}</td>
+                  <td>{{ user.get('address', 'N/A') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 mt-6"> -->
+    </div>
+  </div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+    document.querySelectorAll("tbody tr").forEach((row) => {
+      row.addEventListener("click", function () {
+        const name = row.getAttribute("data-name");
+        const email = row.getAttribute("data-email");
+        const role = row.getAttribute("data-role");
+        const address = row.getAttribute("data-address");
+        const profile = row.getAttribute("data-profile");
+
+        document.getElementById("cardName").textContent = name;
+        document.getElementById("cardEmail").textContent = email;
+        document.getElementById("cardRole").textContent = role;
+        document.getElementById("cardAddress").textContent = address;
+        document.getElementById("cardProfileImage").src = profile;
+
+        const deleteBtn = document.getElementById("cardDeleteBtn");
+        deleteBtn.setAttribute("data-email", row.getAttribute("data-email"));
+
+
+        const card = document.getElementById("profileCard");
+        card.classList.remove("hidden");
+        setTimeout(() => {
+          card.classList.remove("-translate-x-full", "opacity-0");
+          card.classList.add("translate-x-0", "opacity-100");
+        }, 10);
+      });
+    });
+
+    function hideCard() {
+      const card = document.getElementById("profileCard");
+      card.classList.remove("translate-x-0", "opacity-100");
+      card.classList.add("-translate-x-full", "opacity-0");
+      setTimeout(() => {
+        card.classList.add("hidden");
+      }, 500);
+    }
+
+    function deleteCardUser() {
+      const button = document.getElementById("cardDeleteBtn");
+      const email = button.getAttribute("data-email");
+
+      console.log("Preparing to delete user with ID:", email);
+
+      if (!email) {
+        Swal.fire("Error", "Email not found.", "error");
+        return;
+      }
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: `User with email "${email}" will be permanently deleted!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        customClass: {
+          title: "text-xl font-bold text-black dark:text-white",
+          content: "text-sm text-gray-700 dark:text-white",
+          confirmButton: "px-4 py-2 rounded bg-red-600 text-white",
+          cancelButton: "px-4 py-2 rounded bg-gray-300 text-black",
+          popup: "bg-white dark:bg-gray-800 rounded-lg shadow-md",
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            type: "DELETE",
+            url: `/users/delete/email/${encodeURIComponent(email)}`,
+            success: function (response) {
+              Swal.fire({
+                title: "Deleted!",
+                text: "User has been deleted.",
+                icon: "success",
+                confirmButtonText: "OK"
+              }).then(() => {
+                location.reload();
+              });
+            },
+            error: function (xhr) {
+              console.error("Delete failed:", xhr.responseText);
+              Swal.fire("Failed", "Failed to delete user.", "error");
+            }
+          });
+        }
+      });
+    }
+  </script>
+
+</body>
+
+</html>
