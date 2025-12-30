@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-# load_dotenv() ian
-load_dotenv(override=True)
+load_dotenv()
+# load_dotenv(override=True)
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
