@@ -27,6 +27,11 @@
   document.addEventListener("DOMContentLoaded", () => {
     const socket = io("/monitoring_patient");
 
+    // Disconnect socket when user navigates away
+    window.addEventListener('beforeunload', () => {
+      socket.disconnect();
+    });
+
     socket.on("connect", () => {
       console.log("Connected to data monitoring patient bed icu {{ bed_id }}");
       socket.emit("get_data_monitoring_patient", { icustayid: "{{ bed_id }}" });
@@ -103,7 +108,7 @@
         output_total: patient_data.output_total,
         output_4hourly: patient_data.output_4hourly,
       };
-      
+
       $.ajax({
         type: "POST",
         url: "/predict",

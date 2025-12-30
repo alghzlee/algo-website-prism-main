@@ -1,7 +1,5 @@
 <!-- Vitals -->
-<section
-  class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg"
->
+<section class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg">
   <!-- Heart Rate -->
   <div class="mb-2">
     <!-- Ikon dan Judul -->
@@ -16,10 +14,7 @@
 
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="heart_rate_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="heart_rate_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">bpm</p>
@@ -45,10 +40,7 @@
 
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="oxygen_saturation_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="oxygen_saturation_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">%</p>
@@ -73,10 +65,7 @@
       </div>
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="respiratory_rate_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="respiratory_rate_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">rpm</p>
@@ -285,6 +274,11 @@
 
     const socket = io("/vital_patient");
 
+    // Disconnect socket when user navigates away
+    window.addEventListener('beforeunload', () => {
+      socket.disconnect();
+    });
+
     socket.on("connect", () => {
       console.log("Connected to data vital patient bed icu {{ bed_id }}");
       socket.emit("get_data_vital_patient", { icustayid: "{{ bed_id }}" });
@@ -306,12 +300,12 @@
       );
 
       localStorage.setItem(
-          "bloodPressureValue",
-          `${Math.round(vital_data.SysBP)}/${Math.round(
-            vital_data.DiaBP
-          )}`
-        );
-        localStorage.setItem("temperatureValue", Math.round(vital_data.Temp_C));
+        "bloodPressureValue",
+        `${Math.round(vital_data.SysBP)}/${Math.round(
+          vital_data.DiaBP
+        )}`
+      );
+      localStorage.setItem("temperatureValue", Math.round(vital_data.Temp_C));
     });
 
 
@@ -331,7 +325,7 @@
 
       document.getElementById("respiratory_rate_value").innerText =
         localStorage.getItem("respiratoryRateValue");
-      
+
     }, 10);
   });
 </script>
