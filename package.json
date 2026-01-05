@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./app/static/src/css/input.css -o ./app/static/dist/css/output.css --minify",
+    "watch:css": "npx tailwindcss -i ./app/static/src/css/input.css -o ./app/static/dist/css/output.css --watch"
+  },
   "devDependencies": {
     "tailwindcss": "^3.4.15"
   },
