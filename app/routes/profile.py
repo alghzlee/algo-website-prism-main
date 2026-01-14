@@ -2,8 +2,21 @@ from flask import Flask, request, render_template, current_app, Blueprint, jsoni
 from werkzeug.utils import secure_filename
 import jwt
 from app.middleware.authenticate import token_required
+from gridfs import GridFS
+from pymongo import MongoClient
+import certifi
 
 profile_ = Blueprint('profile', __name__)
+
+
+def get_gridfs():
+    """Get GridFS instance from MongoDB Atlas"""
+    client = MongoClient(
+        current_app.config['MONGODB_URL'],
+        tlsCAFile=certifi.where()
+    )
+    db = client[current_app.config['DBNAME']]
+    return GridFS(db)
 
 
 @profile_.route('/profile')
@@ -30,14 +43,37 @@ def update_profile():
         username = request.form["username"]
         email = payload["id"]
         newDoc = {"username": username}
+        
         if "filePict" in request.files:
             file = request.files["filePict"]
-            filename = secure_filename(file.filename)
-            extension = filename.split(".")[-1]
-            file_path = f"src/images/profiles/{email}.{extension}"
-            file.save("app/./static/" + file_path)
-            newDoc["profile"] = filename
-            newDoc["profilePict"] = file_path
+            if file.filename:  # Check if file was actually uploaded
+                filename = secure_filename(file.filename)
+                extension = filename.split(".")[-1].lower()
+                
+                # Generate unique filename for GridFS
+                gridfs_filename = f"profile_{email.replace('@', '_at_').replace('.', '_')}.{extension}"
+                
+                # Upload to MongoDB GridFS
+                fs = get_gridfs()
+                
+                # Delete existing profile picture if exists
+                existing = fs.find_one({'filename': gridfs_filename})
+                if existing:
+                    fs.delete(existing._id)
+                
+                # Also try to delete with old naming convention
+                for ext in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+                    old_filename = f"profile_{email.replace('@', '_at_').replace('.', '_')}.{ext}"
+                    old_file = fs.find_one({'filename': old_filename})
+                    if old_file:
+                        fs.delete(old_file._id)
+                
+                # Upload new file
+                fs.put(file, filename=gridfs_filename)
+                
+                newDoc["profile"] = filename
+                newDoc["profilePict"] = gridfs_filename  # Store GridFS filename
+        
         current_app.db.users.update_one(
             {"email": payload["id"]}, {"$set": newDoc})
         return jsonify({"msg": "Profile successfully updated!"})

@@ -3,13 +3,20 @@ from config import Config
 from app.extensions import socketio
 from pymongo import MongoClient
 from flask_cors import CORS
+import certifi
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     CORS(app, resources={r"/*": {"origins": "*"}})
-    client = MongoClient(app.config['MONGODB_URL'])
+    
+    # Connect to MongoDB Atlas with SSL certificate
+    client = MongoClient(app.config['MONGODB_URL'], tlsCAFile=certifi.where())
     app.db = client[app.config['DBNAME']]
+    
+    # Assets route for serving files from MongoDB GridFS
+    from .routes.assets import assets_
+    app.register_blueprint(assets_)
     
     from .routes.auth import auth_
     app.register_blueprint(auth_)
