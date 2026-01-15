@@ -11,10 +11,7 @@
         id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown"
         data-dropdown-placement="bottom">
         <span class="sr-only">Open user menu</span>
-        <img class="w-8 h-8 rounded-full"
-          src="{% if user_info.profilePict %}{{ url_for('assets.serve_image', filename=user_info.profilePict) }}{% else %}https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32{% endif %}"
-          onerror="this.src='https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32'"
-          alt="user photo" />
+        <img class="w-8 h-8 rounded-full" src="/assets/{{ user_info.profilePict }}" alt="user photo" />
       </button>
       <!-- Dropdown menu -->
       <div

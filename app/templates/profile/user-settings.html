@@ -96,10 +96,7 @@
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                   <a href="#" class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-900">
                     <div class="flex-shrink-0">
-                      <img class="rounded-full w-11 h-11"
-                        src="{% if user_info.profilePict %}{{ url_for('assets.serve_image', filename=user_info.profilePict) }}{% else %}https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=44{% endif %}"
-                        onerror="this.src='https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=44'"
-                        alt="Jese image" />
+                      <img class="rounded-full w-11 h-11" src="/assets/{{ user_info.profilePict }}" alt="Jese image" />
                       <div
                         class="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-blue-600 border border-white rounded-full dark:border-gray-800">
                         <svg class="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -142,10 +139,7 @@
           <li>
             <button id="dropdownAvatarNameButton" data-dropdown-toggle="dropdownAvatarName"
               class="flex items-center text-sm font-medium text-gray-900 dark:text-white">
-              <img class="w-8 h-8 rounded-full"
-                src="{% if user_info.profilePict %}{{ url_for('assets.serve_image', filename=user_info.profilePict) }}{% else %}https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32{% endif %}"
-                onerror="this.src='https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32'"
-                alt="Profile Picture" />
+              <img class="w-8 h-8 rounded-full" src="/assets/{{ user_info.profilePict }}" alt="Profile Picture" />
               <span class="ms-2 hover:text-cyan-500">{{ user_info.username }}</span>
               <!-- Icon Dropdown -->
               <svg class="w-4 h-4 ms-2 hover:text-cyan-500" fill="none" stroke="currentColor" stroke-width="2"
@@ -267,7 +261,7 @@
                 <tr class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 text-black dark:text-white"
                   data-name="{{ user.get('username', '') }}" data-email="{{ user.get('email', '') }}"
                   data-role="{{ user.get('role', '') }}" data-address="{{ user.get('address', '') }}"
-                  data-profile="{{ url_for('static', filename=user.get('profilePict', 'src/images/profiles/default.png')) }}">
+                  data-profile="/assets/{{ user.get('profilePict', 'profiles/default.png') }}">
                   <th>{{ loop.index }}</th>
                   <td>{{ user.get('username', 'N/A') }}</td>
                   <td>{{ user.get('email', 'N/A') }}</td>

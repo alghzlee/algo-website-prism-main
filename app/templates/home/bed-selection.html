@@ -96,10 +96,7 @@
                 <div class="divide-y divide-gray-100 dark:divide-gray-700">
                   <a href="#" class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-900">
                     <div class="flex-shrink-0">
-                      <img class="rounded-full w-11 h-11"
-                        src="{% if user_info.profilePict %}{{ url_for('assets.serve_image', filename=user_info.profilePict) }}{% else %}https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=44{% endif %}"
-                        onerror="this.src='https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=44'"
-                        alt="Jese image" />
+                      <img class="rounded-full w-11 h-11" src="/assets/{{ user_info.profilePict }}" alt="Jese image" />
                       <div
                         class="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-blue-600 border border-white rounded-full dark:border-gray-800">
                         <svg class="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -142,10 +139,7 @@
           <li>
             <button id="dropdownAvatarNameButton" data-dropdown-toggle="dropdownAvatarName"
               class="flex items-center text-sm font-medium text-gray-900 dark:text-white">
-              <img class="w-8 h-8 rounded-full"
-                src="{% if user_info.profilePict %}{{ url_for('assets.serve_image', filename=user_info.profilePict) }}{% else %}https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32{% endif %}"
-                onerror="this.src='https://ui-avatars.com/api/?name={{ user_info.username }}&background=0891b2&color=fff&size=32'"
-                alt="Profile Picture" />
+              <img class="w-8 h-8 rounded-full" src="/assets/{{ user_info.profilePict }}" alt="Profile Picture" />
               <span class="ms-2 hover:text-cyan-500">{{ user_info.username }}</span>
               <!-- Icon Dropdown -->
               <svg class="w-4 h-4 ms-2 hover:text-cyan-500" fill="none" stroke="currentColor" stroke-width="2"
@@ -244,8 +238,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100001">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -269,8 +262,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100002">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -294,8 +286,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100003">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -319,8 +310,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100004">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -344,8 +334,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100005">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -369,8 +358,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100006">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -394,8 +382,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100007">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
@@ -419,8 +406,7 @@
       <div data-aos="zoom-in" data-aos-duration="300"
         class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100008">
-          <img class="w-full h-48 object-cover" src="{{url_for('assets.serve_image', filename='bed-hospital.jpg')}}"
-            alt="Bed Hospital" />
+          <img class="w-full h-48 object-cover" src="/assets/images/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
         <div class="p-4">
           <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
