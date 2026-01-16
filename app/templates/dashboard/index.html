@@ -1,7 +1,5 @@
 <!-- Vitals -->
-<section
-  class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg"
->
+<section class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg">
   <!-- Heart Rate -->
   <div class="mb-2">
     <div class="flex items-center justify-between mb-4">
@@ -14,10 +12,7 @@
 
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="heart_rate_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="heart_rate_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">bpm</p>
@@ -41,10 +36,7 @@
 
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="oxygen_saturation_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="oxygen_saturation_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">%</p>
@@ -67,10 +59,7 @@
       </div>
       <!-- Value -->
       <div class="flex items-baseline">
-        <p
-          class="text-4xl font-bold text-black dark:text-white"
-          id="respiratory_rate_value"
-        >
+        <p class="text-4xl font-bold text-black dark:text-white" id="respiratory_rate_value">
           60
         </p>
         <p class="text-sm text-black dark:text-white ml-1">rpm</p>
@@ -279,7 +268,7 @@
       const bedId = response.bed_id;
       const vitalData = response.vital;
 
-      if (bedId === "{{bed_id}}") {  
+      if (bedId === "{{bed_id}}") {
         updateCharts(charts, vitalData);
 
         document.getElementById("heart_rate_value").innerText = Math.round(vitalData.heart_rate);

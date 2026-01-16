@@ -60,17 +60,22 @@ def sofa_liver(bilirubin):
         return 0
 
 def sofa_cardiovascular(map_value, vasopressor=None):
-    if map_value >= 70:
-        return 0
-    elif map_value < 70:
-        return 1
-    elif vasopressor == 'dopamine_low' or vasopressor == 'dobutamine':
-        return 2
+    """
+    Calculate SOFA cardiovascular score based on MAP and vasopressor use.
+    
+    Vasopressor conditions are checked first as they indicate more severe states.
+    """
+    # Check vasopressor conditions first (more severe)
+    if vasopressor == 'dopamine_high' or vasopressor == 'norepinephrine_high':
+        return 4
     elif vasopressor == 'dopamine_medium' or vasopressor == 'norepinephrine_low':
         return 3
-    elif vasopressor == 'dopamine_high' or vasopressor == 'norepinephrine_high':
-        return 4
-    else:
+    elif vasopressor == 'dopamine_low' or vasopressor == 'dobutamine':
+        return 2
+    # Then check MAP value
+    elif map_value < 70:
+        return 1
+    else:  # map_value >= 70
         return 0
 
 

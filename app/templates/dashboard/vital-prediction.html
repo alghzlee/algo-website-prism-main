@@ -1,124 +1,108 @@
 <html>
-  <head>
-    {% include 'component/header.html'%}
-  </head>
-  <body class="dark:bg-gray-950 bg-gray-100">
-    {% include 'component/navbar.html'%}
 
-    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
-      <!-- Patient Detail -->
-      {% include 'patient-monitoring/detail.html'%}
+<head>
+  {% include 'component/header.html'%}
+</head>
 
-      <!-- Vital -->
-      {% include 'patient-monitoring/vital.html'%}
+<body class="has-fixed-navbar dark:bg-gray-950 bg-gray-100">
+  {% set show_dashboard_menu = true %}
+  {% include 'component/navbar.html'%}
 
-      <!-- Prediction -->
-      <section
-        class="col-span-1 md:col-span-6 lg:col-span-4 bg-white dark:bg-gray-950 p-4 rounded-lg"
-      >
-        <!-- Heart Rate Predict-->
-        <div class="mb-4">
-          <p class="text-[12px] mt-2 mb-6 text-gray-900 dark:text-gray-200">
-            HEART RATE
-          </p>
-          <div class="flex items-center">
-            <!-- Grafik -->
-            <div class="flex-grow">
-              <canvas
-                id="heartRatePredict"
-                class="w-full h-[130px] max-h-[130px]"
-              ></canvas>
-            </div>
-            <div class="pl-7 flex flex-col items-center justify-center ml-4">
-              <i class="mdi mdi-heart-pulse text-5xl text-red-500"></i>
-              <div class="flex items-baseline mt-2">
-                <p
-                  class="text-4xl font-bold text-black dark:text-white"
-                  id="heart_rate_predict_value"
-                >
-                  60
-                </p>
-                <p class="text-sm text-black dark:text-white ml-1">bpm</p>
-              </div>
+  <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
+    <!-- Patient Detail -->
+    {% include 'patient-monitoring/detail.html'%}
+
+    <!-- Vital -->
+    {% include 'patient-monitoring/vital.html'%}
+
+    <!-- Prediction -->
+    <section class="col-span-1 md:col-span-6 lg:col-span-4 bg-white dark:bg-gray-950 p-4 rounded-lg">
+      <!-- Heart Rate Predict-->
+      <div class="mb-4">
+        <p class="text-[12px] mt-2 mb-6 text-gray-900 dark:text-gray-200">
+          HEART RATE
+        </p>
+        <div class="flex items-center">
+          <!-- Grafik -->
+          <div class="flex-grow">
+            <canvas id="heartRatePredict" class="w-full h-[130px] max-h-[130px]"></canvas>
+          </div>
+          <div class="pl-7 flex flex-col items-center justify-center ml-4">
+            <i class="mdi mdi-heart-pulse text-5xl text-red-500"></i>
+            <div class="flex items-baseline mt-2">
+              <p class="text-4xl font-bold text-black dark:text-white" id="heart_rate_predict_value">
+                60
+              </p>
+              <p class="text-sm text-black dark:text-white ml-1">bpm</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Oxygen Saturation Predict -->
-        <div class="mb-4">
-          <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
-            OXYGEN SATURATION
-          </p>
-          <div class="flex items-center">
-            <!-- Grafik -->
-            <div class="flex-grow">
-              <canvas
-                id="oxygenSaturationPredict"
-                class="w-full h-[130px] max-h-[130px]"
-              ></canvas>
-            </div>
-            <div class="pl-7 flex flex-col items-center justify-center ml-4">
-              <i class="mdi mdi-heart-plus-outline text-5xl text-red-500"></i>
-              <div class="flex items-baseline mt-2">
-                <p
-                  class="text-4xl font-bold text-black dark:text-white"
-                  id="oxygen_saturation_predict_value"
-                >
-                  60
-                </p>
-                <p class="text-sm text-black dark:text-white ml-1">%</p>
-              </div>
+      <!-- Oxygen Saturation Predict -->
+      <div class="mb-4">
+        <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
+          OXYGEN SATURATION
+        </p>
+        <div class="flex items-center">
+          <!-- Grafik -->
+          <div class="flex-grow">
+            <canvas id="oxygenSaturationPredict" class="w-full h-[130px] max-h-[130px]"></canvas>
+          </div>
+          <div class="pl-7 flex flex-col items-center justify-center ml-4">
+            <i class="mdi mdi-heart-plus-outline text-5xl text-red-500"></i>
+            <div class="flex items-baseline mt-2">
+              <p class="text-4xl font-bold text-black dark:text-white" id="oxygen_saturation_predict_value">
+                60
+              </p>
+              <p class="text-sm text-black dark:text-white ml-1">%</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Respiratory Rate Predict -->
-        <div class="mb-4">
-          <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
-            RESPIRATORY RATE
-          </p>
-          <div class="flex items-center">
-            <!-- Grafik -->
-            <div class="flex-grow">
-              <canvas
-                id="respiratoryRatePredict"
-                class="w-full h-[130px] max-h-[130px]"
-              ></canvas>
-            </div>
-            <div class="pl-7 flex flex-col items-center justify-center ml-4">
-              <i class="mdi mdi-lungs text-5xl text-red-500"></i>
-              <div class="flex items-baseline mt-2">
-                <p
-                  class="text-4xl font-bold text-black dark:text-white"
-                  id="respiratory_rate_predict_value"
-                >
-                  60
-                </p>
-                <p class="text-sm text-black dark:text-white ml-1">rpm</p>
-              </div>
+      <!-- Respiratory Rate Predict -->
+      <div class="mb-4">
+        <p class="text-[12px] mt-4 mb-6 text-gray-900 dark:text-gray-200">
+          RESPIRATORY RATE
+        </p>
+        <div class="flex items-center">
+          <!-- Grafik -->
+          <div class="flex-grow">
+            <canvas id="respiratoryRatePredict" class="w-full h-[130px] max-h-[130px]"></canvas>
+          </div>
+          <div class="pl-7 flex flex-col items-center justify-center ml-4">
+            <i class="mdi mdi-lungs text-5xl text-red-500"></i>
+            <div class="flex items-baseline mt-2">
+              <p class="text-4xl font-bold text-black dark:text-white" id="respiratory_rate_predict_value">
+                60
+              </p>
+              <p class="text-sm text-black dark:text-white ml-1">rpm</p>
             </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
-      <!-- History -->
-      {% include 'patient-monitoring/history.html'%}
+  <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
+    <!-- History -->
+    {% include 'patient-monitoring/history.html'%}
 
-      <!-- Blood Pressure -->
-      {% include 'patient-monitoring/blood-presurre.html'%}
+    <!-- Blood Pressure -->
+    {% include 'patient-monitoring/blood-presurre.html'%}
 
-      <!-- SOFA Score -->
-      {% include 'patient-monitoring/sofa.html'%}
+    <!-- SOFA Score -->
+    {% include 'patient-monitoring/sofa.html'%}
 
-      <!-- Similar -->
-      {% include 'patient-monitoring/similar.html'%}
+    <!-- Similar -->
+    {% include 'patient-monitoring/similar.html'%}
 
-      <!-- Recommendation -->
-      {% include 'patient-monitoring/treatment-recommendation.html'%}
-    </footer>
-  </body>
+    <!-- Recommendation -->
+    {% include 'patient-monitoring/treatment-recommendation.html'%}
+  </footer>
+</body>
+
 </html>
 
 <script>
@@ -341,56 +325,37 @@
       charts.respiratoryRatePredictChart.update();
     }
 
-    const socket = io("/vital_patient_prediction");
-
-    socket.on("connect", () => {
-      console.log("Connected to data vital prediction bed icu {{ bed_id }}");
-      socket.emit("get_data_prediction_vital_patient");
-    });
-
-    socket.on("data_prediction_vital_patient", (prediction_data) => {
-      console.log("Received data vital prediction:", prediction_data);
-
-      localStorage.setItem(
-        "heartRatePredictValue",
-        Math.round(prediction_data.heart_rate)
-      );
-      localStorage.setItem(
-        "oxygenSaturationPredictValue",
-        Math.round(prediction_data.oxygen_saturation)
-      );
-      localStorage.setItem(
-        "respiratoryRatePredictValue",
-        Math.round(prediction_data.respiratory_rate)
-      );
-      localStorage.setItem(
-        "global_time_predict",
-        Math.round(timePredict)
-      );
-    });
+    // Use MongoDB data from localStorage (synced from vital.html)
+    // Generate smooth waveform based on actual MongoDB values
+    function generateSmoothWaveform(baseValue, amplitude, time) {
+      const noise = Math.random() * 0.5 - 0.25;
+      const wave = amplitude * Math.sin(0.1 * time);
+      return baseValue + wave + noise;
+    }
 
     setInterval(() => {
-      const hr_predict = generateHeartRatePredictWaveform(timePredict);
-      const rr_predict =
-        generateRespiratoryRatePredictWaveform(timePredict);
-      const oxygen_saturation_predict =
-        generateOxygenSaturationPredictWaveform(timePredict);
+      // Get real values from MongoDB (stored in localStorage by vital.html)
+      const realHR = parseFloat(localStorage.getItem("heartRateValue")) || 75;
+      const realSpO2 = parseFloat(localStorage.getItem("oxygenSaturationValue")) || 98;
+      const realRR = parseFloat(localStorage.getItem("respiratoryRateValue")) || 20;
+
+      // Generate smooth waveform animation based on real values
+      const hr_predict = generateSmoothWaveform(realHR, 3, timePredict);
+      const rr_predict = generateSmoothWaveform(realRR, 1.5, timePredict);
+      const oxygen_saturation_predict = generateSmoothWaveform(realSpO2, 1, timePredict);
+
       updatePredictCharts(
         charts,
         hr_predict,
         rr_predict,
         oxygen_saturation_predict
       );
-      document.getElementById("heart_rate_predict_value").innerText =
-        localStorage.getItem("heartRatePredictValue");
 
-      document.getElementById(
-        "oxygen_saturation_predict_value"
-      ).innerText = localStorage.getItem("oxygenSaturationPredictValue");
+      // Display real MongoDB values (synced with left side)
+      document.getElementById("heart_rate_predict_value").innerText = Math.round(realHR);
+      document.getElementById("oxygen_saturation_predict_value").innerText = Math.round(realSpO2);
+      document.getElementById("respiratory_rate_predict_value").innerText = Math.round(realRR);
 
-      document.getElementById(
-        "respiratory_rate_predict_value"
-      ).innerText = localStorage.getItem("respiratoryRatePredictValue");
       timePredict++;
     }, 100);
   });

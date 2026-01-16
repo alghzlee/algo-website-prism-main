@@ -3,6 +3,8 @@
 
 <head>
   {% include 'component/header.html'%}
+  {% set show_dashboard_menu = false %}
+  {% include 'component/navbar.html' %}
 
   <script>
     function is_nickname(asValue) {

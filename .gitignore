@@ -206,3 +206,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Dokumentasi
+Dokumentasi_File_Hilang_Docker.md
+Dokumentasi_Lengkap_PRISM.md
+Dokumentasi_Optimisasi_Docker.md
+
+# Docker
+# .dockerignore
+# Dockerfile*
+# docker-compose*.yml
+
+# Development files
+*.docx
+*.ipynb
+tempCodeRunnerFile.py
+upload_csv_to_mongo.py

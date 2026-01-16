@@ -4,7 +4,8 @@
   {% include 'component/header.html'%}
 </head>
 
-<body class="dark:bg-gray-950 bg-gray-200">
+<body class="has-fixed-navbar dark:bg-gray-950 bg-gray-200">
+  {% set show_dashboard_menu = true %}
   {% include 'component/navbar.html'%}
 
   <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">

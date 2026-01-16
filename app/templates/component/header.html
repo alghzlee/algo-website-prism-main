@@ -1,28 +1,21 @@
 <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PRISM</title>
+<title class="text-gray-900 dark:text-white">PRISM</title>
 <!-- CSS -->
-<link
-  href="{{ url_for('static', filename='dist/css/output.css') }}"
-  rel="stylesheet"
-/>
+<link href="{{ url_for('static', filename='dist/css/output.css') }}" rel="stylesheet" />
 <!-- daisyui -->
-<link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <!-- Flowbite -->
 <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
 
 <!-- Material Design Icons CDN -->
-<link
-  href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css"
-  rel="stylesheet"
-/>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
 <!-- Chart.js-->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!--AOS Library-->
@@ -40,12 +33,12 @@
           window.matchMedia("(prefers-color-scheme: dark)").matches)
       ) {
         $("html").addClass("dark");
-        $("#toggle-circle").addClass("translate-x-8"); 
+        $("#toggle-circle").addClass("translate-x-8");
         $("#sun-icon").removeClass("hidden").addClass("text-blue-500");
         $("#moon-icon").addClass("hidden").removeClass("text-blue-500");
       } else {
         $("html").removeClass("dark");
-        $("#toggle-circle").removeClass("translate-x-8"); 
+        $("#toggle-circle").removeClass("translate-x-8");
         $("#moon-icon").removeClass("hidden").addClass("text-blue-500");
         $("#sun-icon").addClass("hidden").removeClass("text-blue-500");
       }
@@ -55,7 +48,7 @@
 
     $("#toggle-container").click(function () {
       $("html").toggleClass("dark");
-      $("#toggle-circle").toggleClass("translate-x-8"); 
+      $("#toggle-circle").toggleClass("translate-x-8");
 
       if ($("html").hasClass("dark")) {
         localStorage.setItem("color-theme", "dark");
@@ -70,7 +63,49 @@
   });
 </script>
 <style>
+  /* Toggle translation: container w-12 (3rem) - padding (0.5rem) - circle w-5 (1.25rem) = 1.25rem max */
   .translate-x-8 {
-    transform: translateX(2rem);
+    transform: translateX(0.01rem);
+  }
+
+  /* SweetAlert2 Dark Mode Override */
+  html.dark .swal2-popup {
+    background-color: #111827 !important;
+    /* gray-900 */
+    color: #f9fafb !important;
+    /* gray-50 */
+  }
+
+  html.dark .swal2-title {
+    color: #f9fafb !important;
+    /* gray-50 */
+  }
+
+  html.dark .swal2-html-container {
+    color: #d1d5db !important;
+    /* gray-300 */
+  }
+
+  html.dark .swal2-confirm {
+    background-color: #0e7490 !important;
+    /* cyan-700 */
+  }
+
+  html.dark .swal2-confirm:hover {
+    background-color: #0891b2 !important;
+    /* cyan-600 */
+  }
+
+  html.dark .swal2-cancel {
+    background-color: #374151 !important;
+    /* gray-700 */
+  }
+
+  html.dark .swal2-icon.swal2-success .swal2-success-ring {
+    border-color: #22c55e !important;
+  }
+
+  html.dark .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+    background-color: #ef4444 !important;
   }
 </style>

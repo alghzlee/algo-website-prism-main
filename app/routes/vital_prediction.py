@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template, current_app, Blueprint, jsonify, redirect, url_for
-import pandas as pd
+from flask import request, render_template, current_app, Blueprint, redirect, url_for
 import jwt
 
 prediction_ = Blueprint('prediction', __name__)

@@ -1,0 +1,34 @@
+<div id="dropdownAvatarName"
+    class="hidden z-10 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-950 dark:divide-gray-600">
+    <div class="px-4 py-3">
+        <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ user_info.email }}</span>
+    </div>
+    <ul class="py-2">
+        <li>
+            <a href="/profile"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                <i class="mdi mdi-account text-lg me-2"></i>My Profile</a>
+        </li>
+    </ul>
+    <ul class="py-2">
+        <li>
+            <a href="/user-management"
+                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+                <i class="mdi mdi-cog text-lg me-2"></i>User Management</a>
+        </li>
+    </ul>
+    <div class="py-2">
+        <button type="button" onclick="logout()"
+            class="flex items-center px-4 w-full py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+            <i class="mdi mdi-logout text-lg me-2"></i>
+            Logout
+        </button>
+    </div>
+    <div class="py-2">
+        <a href="/sign-up"
+            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-cyan-500 hover:text-white dark:hover:bg-cyan-900 dark:text-gray-200 dark:hover:text-white">
+            <i class="mdi mdi-account-plus-outline text-lg me-2"></i>
+            Sign Up
+        </a>
+    </div>
+</div>

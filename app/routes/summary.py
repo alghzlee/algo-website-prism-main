@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, current_app, Blueprint, jsonify, redirect, url_for
+from flask import request, render_template, current_app, Blueprint, jsonify, redirect, url_for
 import jwt
 from app.middleware.authenticate import token_required
 

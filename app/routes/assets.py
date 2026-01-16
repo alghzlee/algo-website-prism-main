@@ -33,11 +33,17 @@ def serve_asset(filepath):
         content = file_data.read()
         content_type = file_data.content_type or 'application/octet-stream'
         
+        # Disable cache for profile images so updates show immediately
+        if filepath.startswith('profiles/'):
+            cache_control = 'no-cache, no-store, must-revalidate'
+        else:
+            cache_control = 'public, max-age=31536000'  # Cache for 1 year
+        
         return Response(
             content,
             mimetype=content_type,
             headers={
-                'Cache-Control': 'public, max-age=31536000'  # Cache for 1 year
+                'Cache-Control': cache_control
             }
         )
     except Exception as e:

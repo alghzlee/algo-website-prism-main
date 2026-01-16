@@ -1,113 +1,96 @@
-"""
-Predict Routes - Treatment recommendation using SAC Ensemble model.
-Models and data are loaded from MongoDB GridFS.
-"""
-
-from flask import Flask, jsonify, request, Blueprint
-from scipy.stats import zscore
+from flask import jsonify, request, Blueprint
 import numpy as np
 import pickle
 import pandas as pd
-from pydantic import BaseModel, Field
-import copy
 import os
-import random
-import io
 import torch
-from flask_cors import CORS
 from app.data.SAC_deepQnet import EnsembleSAC, AutoEncoder
 from app.services.treatment_recommendation_service import physicianAction, aiRecommendation
-from joblib import load
-from sklearn.preprocessing import MinMaxScaler
 from app.middleware.authenticate import token_required
-from app.services.gridfs_service import download_file, download_to_tempfile, file_exists
 
 predict_ = Blueprint('predict', __name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Global variables - lazy loaded on first request
-_physpol = None
-_loaded_model = None
-_model_loaded = False
+# physpol is now lazy-loaded via get_physpol() function
 
 
-def load_physpol():
-    """Load physpol from GridFS (lazy loading)."""
-    global _physpol
-    if _physpol is None:
-        try:
-            print("[Loader] Loading physpol from GridFS...")
-            physpol_bytes = download_file('data/phys_actionsb.npy')
-            _physpol = np.load(io.BytesIO(physpol_bytes))
-            print(f"✓ physpol loaded, shape: {_physpol.shape}")
-        except FileNotFoundError:
-            print("! WARNING: phys_actionsb.npy not found in GridFS")
-            _physpol = np.array([])
-    return _physpol
-
-
-def load_stats():
-    """Load action normalization stats from GridFS."""
-    try:
-        stats_bytes = download_file('data/action_norm_stats.pkl')
-        return pickle.loads(stats_bytes)
-    except FileNotFoundError:
-        raise FileNotFoundError("action_norm_stats.pkl not found in GridFS")
-
-
-def load_model_from_gridfs(device):
+def inverse_transform_action(norm_action, stats_path):
     """
-    Memuat model Ensemble SAC + Temporal VAE dari MongoDB GridFS.
+    Transform normalized action back to original dosage values.
     
     Args:
+        norm_action: Normalized action array from model
+        stats_path: Path to action_norm_stats.pkl file
+    
+    Returns:
+        Array with raw IV and vasopressor dosages
+    """
+    with open(stats_path, 'rb') as f:
+        stats = pickle.load(f)
+
+    mean_log_iv = stats['mean_log_iv']
+    std_log_iv = stats['std_log_iv']
+    mean_log_vaso = stats['mean_log_vaso']
+    std_log_vaso = stats['std_log_vaso']
+
+    # Transform back from z-score to log1p
+    iv_log = norm_action[:, 0] * std_log_iv + mean_log_iv
+    vaso_log = norm_action[:, 1] * std_log_vaso + mean_log_vaso
+    iv_log = np.abs(iv_log)
+    vaso_log = np.abs(vaso_log)
+    
+    # Transform back to original domain
+    iv_raw = np.expm1(iv_log)
+    vaso_raw = np.expm1(vaso_log)
+    
+    return np.stack([iv_raw, vaso_raw], axis=1)
+
+def load_model(model_path, device):
+    """
+    Memuat model Ensemble SAC + Temporal VAE yang sudah disimpan untuk deployment.
+    
+    Args:
+        model_path (str): Path ke file .pt (misal: 'SACEnsemble-algorithm/best_agent_ensemble.pt')
         device (torch.device): CPU atau CUDA
         
     Returns:
         ensemble (EnsembleSAC): Model siap pakai (sudah berisi VAE & weight terlatih)
     """
-    global _loaded_model, _model_loaded
-    
-    if _model_loaded:
-        return _loaded_model
 
-    print("\n[Loader] Loading models from GridFS...")
+    print(f"\n[Loader] Loading model from: {model_path}")
     
-    # Check if files exist in GridFS
-    ae_exists = file_exists('data/best_ae_mimic.pth')
-    model_exists = file_exists('data/best_agent_ensemble.pt')
-    
-    if not ae_exists:
-        print("! WARNING: best_ae_mimic.pth not found in GridFS")
-    if not model_exists:
-        print("! WARNING: best_agent_ensemble.pt not found in GridFS")
-        return None
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"File model tidak ditemukan di: {model_path}")
 
     # ==============================================================================
     # 1. SETUP & LOAD AUTOENCODER
     # ==============================================================================
-    LATENT_DIM = 24
-    INPUT_DIM = 37
+    LATENT_DIM = 24  # Harus sama dengan output encoder yg dilatih sebelumnya
+    INPUT_DIM = 37   # Raw feature dimension
     NUM_AGENTS = 5
     ACTION_DIM = 2
-    BC_WEIGHT = 0.25
+    BC_WEIGHT = 0.25   # Tidak berpengaruh saat inferensi, tapi butuh untuk init
 
+    # Inisialisasi arsitektur AE (pastikan class AutoEncoder sudah didefinisikan di atas)
     ae_model = AutoEncoder(input_dim=INPUT_DIM, hidden_dim=128, latent_dim=LATENT_DIM).to(device)
 
-    # Download and load AE weights from GridFS
+    # Load bobot yang sudah dilatih (dari tahap sebelumnya)
     try:
-        temp_ae_path = download_to_tempfile('data/best_ae_mimic.pth')
-        ae_model.load_state_dict(torch.load(temp_ae_path, map_location=device))
-        print("✓ Pre-trained AutoEncoder loaded from GridFS.")
-        # Clean up temp file
-        os.unlink(temp_ae_path)
-    except Exception as e:
-        print(f"! WARNING: Could not load AutoEncoder: {e}")
+        ae_model.load_state_dict(
+            torch.load('app/data/best_ae_mimic.pth', map_location=device)
+        )
+        print("✓ Pre-trained AutoEncoder loaded successfully.")
+    except FileNotFoundError:
+        print("! WARNING: 'best_ae_mimic.pth' not found. Please train AutoEncoder first!")
 
+    # Bekukan AutoEncoder (Freeze) agar tidak berubah saat training RL
     for param in ae_model.parameters():
         param.requires_grad = False
     ae_model.eval()
 
+    
     # B. Inisialisasi Ensemble SAC
+    # PENTING: state_dim harus VAE_LATENT_DIM (64), bukan raw 37
     ensemble = EnsembleSAC(
         num_agents=NUM_AGENTS, 
         state_dim=LATENT_DIM, 
@@ -116,18 +99,17 @@ def load_model_from_gridfs(device):
     )
     print(ensemble)
 
-    # --- 3. LOAD WEIGHTS from GridFS ---
+    # --- 3. LOAD WEIGHTS ---
     try:
-        temp_model_path = download_to_tempfile('data/best_agent_ensemble.pt')
-        checkpoint = torch.load(temp_model_path, map_location=device)
-        # Clean up temp file
-        os.unlink(temp_model_path)
+        # Load checkpoint ke device yang benar
+        checkpoint = torch.load(model_path, map_location=device)
         
         # A. Load VAE Weights
         ae_model.load_state_dict(checkpoint['autoencoder_state_dict'])
-        print("✓ Temporal AE weights loaded from GridFS.")
+        print("✓ Temporal AE weights loaded.")
 
         # B. Load Ensemble Weights (Actor & Critic)
+        # Checkpoint menyimpan list of state_dicts
         actor_dicts = checkpoint['actor_state_dicts']
         critic1_dicts = checkpoint['critic1_state_dicts']
         critic2_dicts = checkpoint['critic2_state_dicts']
@@ -137,12 +119,14 @@ def load_model_from_gridfs(device):
             agent.critic_1.load_state_dict(critic1_dicts[i])
             agent.critic_2.load_state_dict(critic2_dicts[i])
             
+            # Pindahkan agent ke device
             agent.actor.to(device)
             agent.critic_1.to(device)
             agent.critic_2.to(device)
             
         print(f"✓ Ensemble weights loaded for {len(ensemble.agents)} agents.")
         
+        # Metadata check (optional)
         if 'best_mean_agent_q' in checkpoint:
             print(f"  > Best Validation Q-Value recorded: {checkpoint['best_mean_agent_q']:.4f}")
 
@@ -150,59 +134,60 @@ def load_model_from_gridfs(device):
         print(f"! ERROR: Struktur file model tidak cocok. Key hilang: {e}")
         return None
     except Exception as e:
-        print(f"! ERROR Loading Model from GridFS: {e}")
+        print(f"! ERROR Loading Model: {e}")
         return None
 
     # --- 4. INTEGRASI & FREEZE ---
+    # Masukkan VAE ke dalam Ensemble
     ensemble.set_autoencoder(ae_model)
     
+    # Set mode evaluasi (Matikan Dropout, Batchnorm statistik beku)
     ae_model.eval()
     for agent in ensemble.agents:
         agent.actor.eval()
         agent.critic_1.eval()
         agent.critic_2.eval()
         
+    # Freeze Gradients (Hemat memori saat inferensi)
     for param in ae_model.parameters(): param.requires_grad = False
     for agent in ensemble.agents:
         for param in agent.actor.parameters(): param.requires_grad = False
         for param in agent.critic_1.parameters(): param.requires_grad = False
         for param in agent.critic_2.parameters(): param.requires_grad = False
 
-    print("[Loader] Model ready for deployment (loaded from GridFS).")
-    
-    _loaded_model = ensemble
-    _model_loaded = True
-    
+    print("[Loader] Model ready for deployment.")
     return ensemble
 
+# ============================================================================
+# MODEL CACHING - Lazy Loading dengan Singleton Pattern
+# Model di-cache di memory setelah first request untuk realtime inference
+# ============================================================================
+_cached_model = None
+_cached_physpol = None
 
 def get_model():
-    """Get the loaded model, loading from GridFS if needed."""
-    global _loaded_model, _model_loaded
-    if not _model_loaded:
-        _loaded_model = load_model_from_gridfs(device)
-    return _loaded_model
+    """
+    Get cached SAC Ensemble model. Lazy loads on first call.
+    Subsequent calls return cached model instantly for realtime inference.
+    """
+    global _cached_model
+    if _cached_model is None:
+        model_path = 'app/data/best_agent_ensemble.pt'
+        print(f"[Model Cache] First request - loading model from {model_path}")
+        _cached_model = load_model(model_path, device)
+        print("[Model Cache] Model cached in memory for realtime inference")
+    return _cached_model
 
-
-def inverse_transform_action(norm_action):
-    """Inverse transform action from normalized to raw dosage."""
-    stats = load_stats()
-
-    mean_log_iv = stats['mean_log_iv']
-    std_log_iv = stats['std_log_iv']
-    mean_log_vaso = stats['mean_log_vaso']
-    std_log_vaso = stats['std_log_vaso']
-
-    # Transformasi balik dari z-score ke log1p
-    iv_log = norm_action[:, 0] * std_log_iv + mean_log_iv
-    vaso_log = norm_action[:, 1] * std_log_vaso + mean_log_vaso
-    iv_log = np.abs(iv_log)
-    vaso_log = np.abs(vaso_log)
-    # Transformasi balik ke domain asli
-    iv_raw = np.expm1(iv_log)
-    vaso_raw = np.expm1(vaso_log)
-    return np.stack([iv_raw, vaso_raw], axis=1)
-
+def get_physpol():
+    """
+    Get cached physician policy data. Lazy loads on first call.
+    """
+    global _cached_physpol
+    if _cached_physpol is None:
+        print("[Model Cache] Loading physician policy data...")
+        _cached_physpol = np.load('app/data/phys_actionsb.npy')
+        print(f"[Model Cache] Physician policy loaded: {_cached_physpol.shape}")
+    return _cached_physpol
 
 @predict_.route("/predict", methods=["POST"])
 @token_required
@@ -211,6 +196,8 @@ def predict():
         input_data = request.json
         user_input = pd.DataFrame([input_data])
         user_input = user_input.apply(pd.to_numeric, errors='coerce')
+        
+        # loaded_model.actor.eval()
         
         reformat = user_input.values.copy()
 
@@ -228,8 +215,11 @@ def predict():
 
         if colnorm_indices.size > 0:
             reformat_colnorm = reformat[:, colnorm_indices]
+
+            # Hardcoded mean dan std
             mean = np.mean(reformat_colnorm)
             std_dev = np.std(reformat_colnorm)
+
             reformat_colnorm = (reformat_colnorm - mean) / std_dev
         else:
             reformat_colnorm = np.zeros((reformat.shape[0], len(colnorm)))
@@ -247,22 +237,18 @@ def predict():
 
         single_state = torch.tensor(processed_state, dtype=torch.float32).unsqueeze(0)
         
-        # Load physpol from GridFS (lazy)
-        physpol = load_physpol()
-        
-        if len(physpol) == 0:
-            return jsonify({"error": "Model data not found in GridFS"}), 500
+        stats_path = 'app/./data/action_norm_stats.pkl'
 
-        # Ambil aksi acak dari physpol
+        # Get random physician action from policy (lazy loaded & cached)
+        physpol = get_physpol()
         idx = np.random.randint(len(physpol))
         physician_action = physpol[idx]  # normalized action
 
-        # Inverse transform dari normalized → raw
-        physician_action = inverse_transform_action(physician_action.reshape(1, -1))[0]
+        # Inverse transform from normalized to raw dosage
+        physician_action = inverse_transform_action(physician_action.reshape(1, -1), stats_path)[0]
 
         print("physpol shape:", np.array(physpol).shape)
         print("sample physpol[idx]:", physician_action)
-        print("physician_action shape:", physician_action.shape)
         
         return jsonify({
             "recommended_action_clinician": physicianAction(physician_action)
@@ -278,6 +264,8 @@ def predict_personalize():
         user_input = pd.DataFrame([input_data])
         user_input = user_input.apply(pd.to_numeric, errors='coerce')
 
+        # loaded_model.actor.eval()
+
         reformat = user_input.values.copy()
 
         # Daftar kolom
@@ -294,8 +282,11 @@ def predict_personalize():
 
         if colnorm_indices.size > 0:
             reformat_colnorm = reformat[:, colnorm_indices]
+
+            # Hardcoded mean dan std
             mean = np.mean(reformat_colnorm)
             std_dev = np.std(reformat_colnorm)
+
             reformat_colnorm = (reformat_colnorm - mean) / std_dev
         else:
             reformat_colnorm = np.zeros((reformat.shape[0], len(colnorm)))
@@ -313,22 +304,16 @@ def predict_personalize():
 
         single_state = torch.tensor(processed_state, dtype=torch.float32).unsqueeze(0)
 
-        # Get model (lazy load from GridFS)
-        loaded_model = get_model()
-        
-        if loaded_model is None:
-            return jsonify({"error": "Model not loaded. Please upload models to GridFS."}), 500
-
-        # Get action dari model
+        # Get action from model (tanh output in [-1, 1]) - lazy loaded & cached
+        model = get_model()
         with torch.no_grad():
-            norm_action = loaded_model.get_action(single_state, strategy='mean')
+            norm_action = model.get_action(single_state, strategy='mean')
             norm_action = norm_action.reshape(1, -1)
 
-        # Load stats and inverse transform
-        stats = load_stats()
-        print("Stats Loaded:", stats)
+        stats_path = 'app/./data/action_norm_stats.pkl'
 
-        raw_action = inverse_transform_action(norm_action)
+        # Inverse transform from normalized to raw dosage
+        raw_action = inverse_transform_action(norm_action, stats_path)
 
         print(f"Predicted raw action: IV={raw_action[0,0]:.3f} ml, Vaso={raw_action[0,1]:.3f} ug/kg/min")
 

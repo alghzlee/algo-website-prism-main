@@ -81,8 +81,8 @@
 <script>
   let time = localStorage.getItem("global_time");
 
-  function generateHeartRateWaveform(t) {
-    const baseline = 75;
+  // Waveform generators now use dynamic baseline from MongoDB
+  function generateHeartRateWaveform(t, baseline) {
     const amplitude = 5;
     const frequency = 0.1;
     const smoothFactor = 0.02;
@@ -94,17 +94,15 @@
     return Math.min(Math.max(smoothHeartRate, 50), 120);
   }
 
-  function generateOxygenSaturationWaveform(t) {
+  function generateOxygenSaturationWaveform(t, baseline) {
     const amplitude = 2;
-    const baseline = 98;
     const frequency = 0.2;
     const noise = Math.random() * 0.5 - 0.25;
     return baseline + amplitude * Math.sin(frequency * t + Math.PI / 2) + noise;
   }
 
-  function generateRespiratoryRateWaveform(t) {
+  function generateRespiratoryRateWaveform(t, baseline) {
     const amplitude = 2;
-    const baseline = 20;
     const frequency = 0.1;
     const noise = Math.random() * 1 - 0.5;
     return baseline + amplitude * Math.sin(frequency * t) + noise;
@@ -286,46 +284,43 @@
 
     socket.on("data_vital_patient", (vital_data) => {
       console.log("Received data vital patient:", vital_data);
-      localStorage.setItem(
-        "heartRateValue",
-        Math.round(vital_data.HR)
-      );
-      localStorage.setItem(
-        "oxygenSaturationValue",
-        Math.round(vital_data.SpO2)
-      );
-      localStorage.setItem(
-        "respiratoryRateValue",
-        Math.round(vital_data.RR)
-      );
 
+      // Extract values from MongoDB data
+      const hr = Math.round(vital_data.HR);
+      const spo2 = Math.round(vital_data.SpO2);
+      const rr = Math.round(vital_data.RR);
+
+      // Update localStorage
+      localStorage.setItem("heartRateValue", hr);
+      localStorage.setItem("oxygenSaturationValue", spo2);
+      localStorage.setItem("respiratoryRateValue", rr);
       localStorage.setItem(
         "bloodPressureValue",
-        `${Math.round(vital_data.SysBP)}/${Math.round(
-          vital_data.DiaBP
-        )}`
+        `${Math.round(vital_data.SysBP)}/${Math.round(vital_data.DiaBP)}`
       );
       localStorage.setItem("temperatureValue", Math.round(vital_data.Temp_C));
+
+      // Update display values immediately
+      document.getElementById("heart_rate_value").innerText = hr;
+      document.getElementById("oxygen_saturation_value").innerText = spo2;
+      document.getElementById("respiratory_rate_value").innerText = rr;
+
+      // Update charts with real data from MongoDB
+      updateCharts(charts, vital_data.HR, vital_data.RR, vital_data.SpO2);
     });
 
-
+    // Generate waveform animation using real MongoDB values as baseline
     setInterval(() => {
-      const hr = generateHeartRateWaveform(time);
-      const rr = generateRespiratoryRateWaveform(time);
-      const oxygen_saturation = generateOxygenSaturationWaveform(time);
+      // Get real values from localStorage (updated by socket)
+      const realHR = parseFloat(localStorage.getItem("heartRateValue")) || 75;
+      const realSpO2 = parseFloat(localStorage.getItem("oxygenSaturationValue")) || 98;
+      const realRR = parseFloat(localStorage.getItem("respiratoryRateValue")) || 20;
+
+      const hr = generateHeartRateWaveform(time, realHR);
+      const rr = generateRespiratoryRateWaveform(time, realRR);
+      const oxygen_saturation = generateOxygenSaturationWaveform(time, realSpO2);
       updateCharts(charts, hr, rr, oxygen_saturation);
       time++;
     }, 100);
-    setInterval(() => {
-      document.getElementById("heart_rate_value").innerText =
-        localStorage.getItem("heartRateValue");
-
-      document.getElementById("oxygen_saturation_value").innerText =
-        localStorage.getItem("oxygenSaturationValue");
-
-      document.getElementById("respiratory_rate_value").innerText =
-        localStorage.getItem("respiratoryRateValue");
-
-    }, 10);
   });
 </script>

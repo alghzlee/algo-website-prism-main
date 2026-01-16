@@ -1,5 +1,4 @@
-from flask import Flask, request, render_template, current_app, Blueprint, jsonify, redirect, url_for
-import json
+from flask import request, render_template, current_app, Blueprint, redirect, url_for
 import jwt
 
 treatments_ = Blueprint('treatments', __name__)

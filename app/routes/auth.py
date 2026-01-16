@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import Flask, request, render_template, current_app, Blueprint, jsonify, redirect, url_for, make_response
+from flask import request, render_template, current_app, Blueprint, jsonify, redirect, url_for, make_response
 import hashlib
 import jwt
 from app.middleware.authenticate import token_required
@@ -72,13 +72,16 @@ def sign_up_save():
     role = request.form.get('role')
     password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
+    # Generate default avatar using UI Avatars API
+    default_avatar = f"https://ui-avatars.com/api/?name={username}&background=0891b2&color=fff&size=128"
+    
     doc = {
         "username": username,
         "email": email,
         "password": password_hash,
         "role": role,
         "profile": "",
-        "profilePict": "src/images/profiles/profile.jpeg"
+        "profilePict": default_avatar
     }
     exists = bool(current_app.db.users.find_one({"email": email}))
     if exists == False:

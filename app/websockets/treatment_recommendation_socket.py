@@ -1,17 +1,19 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask_socketio import emit
-from app.extensions import socketio, mongo_db
+from app.extensions import socketio
 from app.services.read_data_mongo_services import read_data_mongo
 
 treatmentRecommendationSocketio = Blueprint(
     'treatment_recommendation', __name__
 )
 
-# collection name = nama file CSV (tanpa .csv)
-collection_monitoring_patient = mongo_db["df_with_readable_charttime"]
-
 # menyimpan index streaming per icustayid
 data_monitoring_patient = {}
+
+
+def get_monitoring_collection():
+    """Get MongoDB collection lazily at runtime using Flask app context."""
+    return current_app.db["df_with_readable_charttime"]
 
 
 @socketio.on('connect', namespace='/monitoring_patient')
@@ -36,7 +38,7 @@ def handle_get_data(data):
         data_monitoring_patient[icustayid] = 0
 
     # Ambil data dari MongoDB (sekali saja)
-    vital_data = read_data_mongo(collection_monitoring_patient, icustayid)
+    vital_data = read_data_mongo(get_monitoring_collection(), icustayid)
 
     if len(vital_data) == 0:
         emit(

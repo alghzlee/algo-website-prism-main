@@ -1,6 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask_socketio import emit
-from app.extensions import socketio, mongo_db
+from app.extensions import socketio
 from app.services.read_data_mongo_services import read_data_mongo
 from app.services.monitoring_patient_service import (
     read_detail_patient,
@@ -15,13 +15,19 @@ from app.services.monitoring_patient_service import (
 
 patientMonitoringSocketio = Blueprint('patient_monitoring', __name__)
 
-# MongoDB collections
-collection_vital_patient = mongo_db["selected_data"]
-collection_sofa_patient = mongo_db["sofa_indicators"]
-
 # streaming index
 data_vital_patient = {}
 data_sofa_patient = {}
+
+
+def get_vital_collection():
+    """Get MongoDB collection lazily at runtime using Flask app context."""
+    return current_app.db["selected_data"]
+
+
+def get_sofa_collection():
+    """Get MongoDB collection lazily at runtime using Flask app context."""
+    return current_app.db["sofa_indicators"]
 
 
 # =========================
@@ -56,7 +62,7 @@ def handle_get_vital(data):
         data_vital_patient[icustayid] = 0
 
     vital_data = read_data_mongo(
-        collection_vital_patient,
+        get_vital_collection(),
         icustayid
     )
 
@@ -97,7 +103,7 @@ def handle_get_sofa(data):
         data_sofa_patient[icustayid] = 0
 
     sofa_data = read_data_mongo(
-        collection_sofa_patient,
+        get_sofa_collection(),
         icustayid
     )
 
@@ -108,16 +114,25 @@ def handle_get_sofa(data):
         )
         return
 
+    def safe_float(value, default=0.0):
+        """Safely convert value to float, returning default if None."""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+
     while True:
         index = data_sofa_patient[icustayid]
         row = sofa_data[index]
 
-        respiratory = sofa_respiratory(float(row['Respiratory']))
-        coagulation = sofa_coagulation(float(row['Coagulation']))
-        liver = sofa_liver(float(row['Liver']))
-        cardiovascular = sofa_cardiovascular(float(row['Cardiovascular']))
-        neurological = sofa_neurological(float(row['Neurological']))
-        renal = sofa_renal(float(row['Renal']))
+        respiratory = sofa_respiratory(safe_float(row.get('Respiratory')))
+        coagulation = sofa_coagulation(safe_float(row.get('Coagulation')))
+        liver = sofa_liver(safe_float(row.get('Liver')))
+        cardiovascular = sofa_cardiovascular(safe_float(row.get('Cardiovascular')))
+        neurological = sofa_neurological(safe_float(row.get('Neurological')))
+        renal = sofa_renal(safe_float(row.get('Renal')))
 
         sofa_score = calculate_sofa_score(
             respiratory,

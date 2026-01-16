@@ -1,99 +1,96 @@
 <html>
-  <head>
-    {% include 'component/header.html'%}
-  </head>
-  <body class="dark:bg-gray-950 bg-gray-100">
-    {% include 'component/navbar.html'%}
 
-    <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
-      <!-- Patient Detail -->
-      {% include 'patient-monitoring/detail.html'%}
+<head>
+  {% include 'component/header.html'%}
+</head>
 
-      <!-- Vital -->
-      {% include 'patient-monitoring/vital.html'%}
+<body class="has-fixed-navbar dark:bg-gray-950 bg-gray-100">
+  {% set show_dashboard_menu = true %}
+  {% include 'component/navbar.html'%}
 
-      <section
-        class="relative col-span-1 md:col-span-6 lg:col-span-4 bg-slate-200 dark:bg-slate-800 p-6 rounded-lg shadow-lg"
-      >
-        <a
-          href="javascript:history.back()"
-          class="absolute top-4 left-6 flex items-center text-1xl font-medium text-gray-700 dark:text-gray-400 hover:text-cyan-500 dark:hover:text-cyan-500 transition"
-        >
-          <i class="mdi mdi-arrow-left mr-2 text-2xl"></i>
-          Back
-        </a>
+  <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 p-4">
+    <!-- Patient Detail -->
+    {% include 'patient-monitoring/detail.html'%}
 
-        <h2
-          class="text-2xl mt-4 mb-14 font-bold text-black dark:text-white text-center"
-        >
-          Summary Patient
-        </h2>
+    <!-- Vital -->
+    {% include 'patient-monitoring/vital.html'%}
 
-        <div id="detailSummary" class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-          <div class="space-y-4">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              ID: <span class="text-black dark:text-white">39762626</span>
-            </p>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              Age: <span class="text-black dark:text-white">50</span>
-            </p>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              Gender: <span class="text-black dark:text-white">Male</span>
-            </p>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              Admission Date:
-              <span class="text-black dark:text-white">Jan 15, 2022</span>
-            </p>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              Primary Diagnosis:
-              <span class="text-black dark:text-white">failure heart 1</span>
-            </p>
-          </div>
+    <section
+      class="relative col-span-1 md:col-span-6 lg:col-span-4 bg-slate-200 dark:bg-slate-800 p-6 rounded-lg shadow-lg">
+      <a href="javascript:history.back()"
+        class="absolute top-4 left-6 flex items-center text-1xl font-medium text-gray-700 dark:text-gray-400 hover:text-cyan-500 dark:hover:text-cyan-500 transition">
+        <i class="mdi mdi-arrow-left mr-2 text-2xl"></i>
+        Back
+      </a>
 
-          <div class="mt-6 md:mt-0">
-            <h3 class="text-lg font-semibold text-black dark:text-white mb-4">
-              Medical History:
-            </h3>
-            <ul
-              class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 space-y-2"
-            >
-              <li>Chronic Obstructive Pulmonary Disease (COPD)</li>
-              <li>Rheumatoid arthritis</li>
-              <li>Type 1 Diabetes Mellitus</li>
-            </ul>
-          </div>
-        </div>
+      <h2 class="text-2xl mt-4 mb-14 font-bold text-black dark:text-white text-center">
+        Summary Patient
+      </h2>
 
-        <div class="mt-8">
-          <h3 class="text-lg font-semibold text-black dark:text-white mb-4">
-            Current Condition:
-          </h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">
-            Condition Progression: Post-Surgery: Patients undergoing major or
-            invasive surgery, such as heart surgery or organ replacement,
-            usually require ICU care during the critical recovery phase.
+      <div id="detailSummary" class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+        <div class="space-y-4">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            ID: <span class="text-black dark:text-white">39762626</span>
+          </p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Age: <span class="text-black dark:text-white">50</span>
+          </p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Gender: <span class="text-black dark:text-white">Male</span>
+          </p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Admission Date:
+            <span class="text-black dark:text-white">Jan 15, 2022</span>
+          </p>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            Primary Diagnosis:
+            <span class="text-black dark:text-white">failure heart 1</span>
           </p>
         </div>
-      </section>
-    </main>
 
-    <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
-      <!-- History -->
-      {% include 'patient-monitoring/history.html'%}
+        <div class="mt-6 md:mt-0">
+          <h3 class="text-lg font-semibold text-black dark:text-white mb-4">
+            Medical History:
+          </h3>
+          <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-300 space-y-2">
+            <li>Chronic Obstructive Pulmonary Disease (COPD)</li>
+            <li>Rheumatoid arthritis</li>
+            <li>Type 1 Diabetes Mellitus</li>
+          </ul>
+        </div>
+      </div>
 
-      <!-- Blood Pressure -->
-      {% include 'patient-monitoring/blood-presurre.html'%}
+      <div class="mt-8">
+        <h3 class="text-lg font-semibold text-black dark:text-white mb-4">
+          Current Condition:
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          Condition Progression: Post-Surgery: Patients undergoing major or
+          invasive surgery, such as heart surgery or organ replacement,
+          usually require ICU care during the critical recovery phase.
+        </p>
+      </div>
+    </section>
+  </main>
 
-      <!-- SOFA Score -->
-      {% include 'patient-monitoring/sofa.html'%}
+  <footer class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4">
+    <!-- History -->
+    {% include 'patient-monitoring/history.html'%}
 
-      <!-- Similar -->
-      {% include 'patient-monitoring/similar.html'%}
+    <!-- Blood Pressure -->
+    {% include 'patient-monitoring/blood-presurre.html'%}
 
-      <!-- Recommendation -->
-      {% include 'patient-monitoring/treatment-recommendation.html'%}
-    </footer>
-  </body>
+    <!-- SOFA Score -->
+    {% include 'patient-monitoring/sofa.html'%}
+
+    <!-- Similar -->
+    {% include 'patient-monitoring/similar.html'%}
+
+    <!-- Recommendation -->
+    {% include 'patient-monitoring/treatment-recommendation.html'%}
+  </footer>
+</body>
+
 </html>
 
 <script>
