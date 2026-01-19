@@ -213,8 +213,8 @@ Dokumentasi_Lengkap_PRISM.md
 Dokumentasi_Optimisasi_Docker.md
 
 # Docker
-# .dockerignore
-# Dockerfile*
+.dockerignore
+Dockerfile*
 # docker-compose*.yml
 
 # Development files

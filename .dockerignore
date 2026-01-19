@@ -47,6 +47,7 @@ tempCodeRunnerFile.py
 # Documentation
 *.md
 !README.md
+readme.txt
 # Docker/CI
 Dockerfile*
 docker-compose*
