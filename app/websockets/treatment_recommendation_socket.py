@@ -53,6 +53,6 @@ def handle_get_data(data):
         row = vital_data[index]
         emit('data_monitoring_patient', row)
 
-        socketio.sleep(5)
+        socketio.sleep(10)  # Balance between performance and responsiveness
 
         data_monitoring_patient[icustayid] = (index + 1) % len(vital_data)

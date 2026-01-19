@@ -325,38 +325,28 @@
       charts.respiratoryRatePredictChart.update();
     }
 
-    // Use MongoDB data from localStorage (synced from vital.html)
-    // Generate smooth waveform based on actual MongoDB values
-    function generateSmoothWaveform(baseValue, amplitude, time) {
-      const noise = Math.random() * 0.5 - 0.25;
-      const wave = amplitude * Math.sin(0.1 * time);
-      return baseValue + wave + noise;
-    }
-
+    // Waveform functions are loaded from waveform-utils.js (included via vital.html)
+    // Sync with left side charts using same waveform generation & global_time
     setInterval(() => {
+      // Get global time from left side charts for perfect sync
+      const globalTime = parseInt(localStorage.getItem("global_time")) || 0;
+
       // Get real values from MongoDB (stored in localStorage by vital.html)
       const realHR = parseFloat(localStorage.getItem("heartRateValue")) || 75;
       const realSpO2 = parseFloat(localStorage.getItem("oxygenSaturationValue")) || 98;
       const realRR = parseFloat(localStorage.getItem("respiratoryRateValue")) || 20;
 
-      // Generate smooth waveform animation based on real values
-      const hr_predict = generateSmoothWaveform(realHR, 3, timePredict);
-      const rr_predict = generateSmoothWaveform(realRR, 1.5, timePredict);
-      const oxygen_saturation_predict = generateSmoothWaveform(realSpO2, 1, timePredict);
+      // Generate same EHR-like waveforms using synced time
+      const hr = generateHeartRateWaveform(globalTime, realHR);
+      const rr = generateRespiratoryRateWaveform(globalTime, realRR);
+      const spo2 = generateOxygenSaturationWaveform(globalTime, realSpO2);
 
-      updatePredictCharts(
-        charts,
-        hr_predict,
-        rr_predict,
-        oxygen_saturation_predict
-      );
+      updatePredictCharts(charts, hr, rr, spo2);
 
-      // Display real MongoDB values (synced with left side)
+      // Display real MongoDB values
       document.getElementById("heart_rate_predict_value").innerText = Math.round(realHR);
       document.getElementById("oxygen_saturation_predict_value").innerText = Math.round(realSpO2);
       document.getElementById("respiratory_rate_predict_value").innerText = Math.round(realRR);
-
-      timePredict++;
-    }, 100);
+    }, 200); // 200ms for smooth animation with lower CPU usage
   });
 </script>

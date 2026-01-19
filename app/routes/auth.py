@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from flask import request, render_template, current_app, Blueprint, jsonify, redirect, url_for, make_response
 import hashlib
 import jwt
-from app.middleware.authenticate import token_required
+from app.middleware.authenticate import token_required, admin_required
 from bson import ObjectId
 
 
@@ -70,6 +70,7 @@ def sign_up_save():
     email = request.form['email']
     password = request.form['password']
     role = request.form.get('role')
+    address = request.form.get('address', '')
     password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
 
     # Generate default avatar using UI Avatars API
@@ -80,6 +81,7 @@ def sign_up_save():
         "email": email,
         "password": password_hash,
         "role": role,
+        "address": address,
         "profile": "",
         "profilePict": default_avatar
     }
@@ -91,6 +93,7 @@ def sign_up_save():
 
 
 @auth_.route('/users/delete/email/<email>', methods=['DELETE'])
+@admin_required
 def delete_user_by_email(email):
     if not email:
         return jsonify({'error': 'Email is required'}), 400

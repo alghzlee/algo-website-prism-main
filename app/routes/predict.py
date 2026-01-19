@@ -189,15 +189,66 @@ def get_physpol():
         print(f"[Model Cache] Physician policy loaded: {_cached_physpol.shape}")
     return _cached_physpol
 
+# ============================================================================
+# PREDICTION RESULT CACHING - Avoid redundant inference
+# ============================================================================
+import hashlib
+import time as time_module
+
+_prediction_cache = {}
+_cache_ttl = 15  # Cache results for 15 seconds (balance between performance and responsiveness)
+
+def _get_input_hash(input_data):
+    """Generate hash from input data for caching."""
+    # Create a consistent string representation
+    sorted_items = sorted(input_data.items())
+    input_str = str(sorted_items)
+    return hashlib.md5(input_str.encode()).hexdigest()
+
+def _get_cached_prediction(cache_key, cache_type):
+    """Get cached prediction if exists and not expired."""
+    global _prediction_cache
+    cache_entry = _prediction_cache.get(f"{cache_type}_{cache_key}")
+    if cache_entry:
+        if time_module.time() - cache_entry['timestamp'] < _cache_ttl:
+            return cache_entry['result']
+        else:
+            # Expired, remove from cache
+            del _prediction_cache[f"{cache_type}_{cache_key}"]
+    return None
+
+def _set_cached_prediction(cache_key, cache_type, result):
+    """Cache prediction result."""
+    global _prediction_cache
+    # Limit cache size to prevent memory issues
+    if len(_prediction_cache) > 100:
+        # Remove oldest entries
+        oldest_keys = sorted(_prediction_cache.keys(), 
+                            key=lambda k: _prediction_cache[k]['timestamp'])[:50]
+        for k in oldest_keys:
+            del _prediction_cache[k]
+    
+    _prediction_cache[f"{cache_type}_{cache_key}"] = {
+        'result': result,
+        'timestamp': time_module.time()
+    }
+
+
 @predict_.route("/predict", methods=["POST"])
 @token_required
 def predict():
     try:
         input_data = request.json
+        
+        # Check cache first
+        cache_key = _get_input_hash(input_data)
+        cached_result = _get_cached_prediction(cache_key, 'clinician')
+        if cached_result:
+            print("[Cache] Returning cached clinician prediction")
+            return jsonify(cached_result)
+        
         user_input = pd.DataFrame([input_data])
         user_input = user_input.apply(pd.to_numeric, errors='coerce')
-        
-        # loaded_model.actor.eval()
         
         reformat = user_input.values.copy()
 
@@ -250,9 +301,10 @@ def predict():
         print("physpol shape:", np.array(physpol).shape)
         print("sample physpol[idx]:", physician_action)
         
-        return jsonify({
-            "recommended_action_clinician": physicianAction(physician_action)
-        })
+        result = {"recommended_action_clinician": physicianAction(physician_action)}
+        _set_cached_prediction(cache_key, 'clinician', result)
+        
+        return jsonify(result)
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -261,10 +313,16 @@ def predict():
 def predict_personalize():
     try:
         input_data = request.json
+        
+        # Check cache first
+        cache_key = _get_input_hash(input_data)
+        cached_result = _get_cached_prediction(cache_key, 'sac')
+        if cached_result:
+            print("[Cache] Returning cached SAC prediction")
+            return jsonify(cached_result)
+        
         user_input = pd.DataFrame([input_data])
         user_input = user_input.apply(pd.to_numeric, errors='coerce')
-
-        # loaded_model.actor.eval()
 
         reformat = user_input.values.copy()
 
@@ -317,9 +375,10 @@ def predict_personalize():
 
         print(f"Predicted raw action: IV={raw_action[0,0]:.3f} ml, Vaso={raw_action[0,1]:.3f} ug/kg/min")
 
-        return jsonify({
-            "recommended_action_model_personalize": aiRecommendation(raw_action[0])
-        })
+        result = {"recommended_action_model_personalize": aiRecommendation(raw_action[0])}
+        _set_cached_prediction(cache_key, 'sac', result)
+        
+        return jsonify(result)
 
     except Exception as e:
         return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 400

@@ -30,9 +30,6 @@ networkx==3.4.2
 numpy==2.2.2
 packaging==24.2
 pandas==2.2.3
-pillow==11.1.0
-pydantic==2.10.6
-pydantic_core==2.27.2
 PyJWT==2.10.1
 pymongo==4.11
 pyparsing==3.3.1
@@ -42,16 +39,12 @@ python-engineio==4.11.2
 python-socketio==5.12.1
 pytz==2024.2
 requests==2.32.3
-scikit-learn==1.6.0
 scipy==1.15.1
 setuptools==80.9.0
 simple-websocket==1.1.0
 six==1.17.0
-sympy==1.13.1
 threadpoolctl==3.5.0
 torch==2.6.0
-torchaudio==2.6.0
-torchvision==0.21.0
 typing_extensions==4.12.2
 tzdata==2025.1
 urllib3==2.3.0

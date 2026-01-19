@@ -22,6 +22,7 @@
       let email = $("#email").val();
       let password = $("#password").val();
       let role = $("#selectedRoleInput").val();
+      let address = $("#address").val();
       let confirmPassword = $("#confirmPassword").val();
       let isChecked = $("#checkInput").prop("checked");
 
@@ -60,6 +61,24 @@
           .removeClass("is-safe")
           .addClass("is-danger");
         $("#email").focus();
+        return;
+      }
+
+      if (!role || role === "") {
+        Swal.fire({
+          icon: "warning",
+          title: "Role Required",
+          text: "Please select a role before registering!",
+          confirmButtonText: "Ok",
+          customClass: {
+            title: "text-xl font-bold text-black dark:text-white",
+            content: "text-sm text-gray-700 dark:text-white",
+            confirmButton:
+              "px-6 py-2 rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900 dark:hover:text-white",
+            popup:
+              "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+          },
+        });
         return;
       }
 
@@ -115,6 +134,22 @@
         return;
       }
 
+      if (address === "") {
+        $("#helpAddress")
+          .text("Please enter your address!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#address").focus();
+        return;
+      }
+
+      if (address != "") {
+        $("#helpAddress")
+          .text("")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+      }
+
       if (!isChecked) {
         Swal.fire({
           icon: "info",
@@ -145,6 +180,7 @@
           email: email,
           password: password,
           role: role,
+          address: address,
         },
         success: function (response) {
           if (response["exists"]) {
@@ -244,6 +280,14 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div>
+          <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your
+            address</label>
+          <input type="text" name="address" id="address"
+            class="bg-gray-50 border border-cyan-500 text-gray-900 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5 dark:bg-gray-800 dark:border-cyan-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-600 dark:focus:border-cyan-600"
+            placeholder="Enter your address" />
+          <p id="helpAddress" class="help is-hidden text-sm mt-1 text-gray-500 dark:text-gray-500"></p>
         </div>
         <div>
           <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your

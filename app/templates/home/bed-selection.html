@@ -77,10 +77,10 @@
     </div>
 
     <!-- BED ICU -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 mt-6">
+    <div id="bed-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 mt-6">
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100001"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100001">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -103,8 +103,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100002"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100002">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -127,8 +127,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100003"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100003">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -151,8 +151,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100004"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100004">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -175,8 +175,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100005"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100005">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -199,8 +199,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100006"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100006">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -223,8 +223,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100007"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100007">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -247,8 +247,8 @@
       </div>
 
       <!-- Card Bed ICU -->
-      <div data-aos="zoom-in" data-aos-duration="300"
-        class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100008"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
         <a href="/similarity/50100008">
           <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
         </a>
@@ -275,6 +275,28 @@
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
     AOS.init();
+
+    // Search functionality for bed selection
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("default-search");
+      const bedCards = document.querySelectorAll(".bed-card");
+
+      searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+
+        bedCards.forEach((card) => {
+          const bedId = card.getAttribute("data-bed-id");
+          const bedTitle = card.querySelector("h5").textContent.toLowerCase();
+
+          // Show/hide card based on search term matching bed ID or title
+          if (bedId.includes(searchTerm) || bedTitle.includes(searchTerm)) {
+            card.style.display = "block";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    });
   </script>
 </body>
 

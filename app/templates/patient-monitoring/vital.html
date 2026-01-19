@@ -75,38 +75,13 @@
     <div>
       <canvas id="respiratoryRate" class="w-full h-40"></canvas>
     </div>
-  </div>
 </section>
 
+<!-- Import shared waveform utilities -->
+<script src="{{ url_for('static', filename='src/js/waveform-utils.js') }}"></script>
+
 <script>
-  let time = localStorage.getItem("global_time");
-
-  // Waveform generators now use dynamic baseline from MongoDB
-  function generateHeartRateWaveform(t, baseline) {
-    const amplitude = 5;
-    const frequency = 0.1;
-    const smoothFactor = 0.02;
-    const noise = Math.random() * 0.5 - 0.25;
-
-    const heartRate = baseline + amplitude * Math.sin(frequency * t) + noise;
-    const smoothHeartRate =
-      heartRate * (1 - smoothFactor) + baseline * smoothFactor;
-    return Math.min(Math.max(smoothHeartRate, 50), 120);
-  }
-
-  function generateOxygenSaturationWaveform(t, baseline) {
-    const amplitude = 2;
-    const frequency = 0.2;
-    const noise = Math.random() * 0.5 - 0.25;
-    return baseline + amplitude * Math.sin(frequency * t + Math.PI / 2) + noise;
-  }
-
-  function generateRespiratoryRateWaveform(t, baseline) {
-    const amplitude = 2;
-    const frequency = 0.1;
-    const noise = Math.random() * 1 - 0.5;
-    return baseline + amplitude * Math.sin(frequency * t) + noise;
-  }
+  let time = localStorage.getItem("global_time") || 0;
 
   function initializeChart() {
     const heartRateCtx = document.getElementById("heartRate").getContext("2d");
@@ -290,7 +265,7 @@
       const spo2 = Math.round(vital_data.SpO2);
       const rr = Math.round(vital_data.RR);
 
-      // Update localStorage
+      // Update localStorage for other components to use
       localStorage.setItem("heartRateValue", hr);
       localStorage.setItem("oxygenSaturationValue", spo2);
       localStorage.setItem("respiratoryRateValue", rr);
@@ -304,23 +279,25 @@
       document.getElementById("heart_rate_value").innerText = hr;
       document.getElementById("oxygen_saturation_value").innerText = spo2;
       document.getElementById("respiratory_rate_value").innerText = rr;
-
-      // Update charts with real data from MongoDB
-      updateCharts(charts, vital_data.HR, vital_data.RR, vital_data.SpO2);
     });
 
-    // Generate waveform animation using real MongoDB values as baseline
+    // Generate EHR-style waveform animation using MongoDB values as baseline
+    // Uses global_time from localStorage so left & right charts stay in sync
     setInterval(() => {
-      // Get real values from localStorage (updated by socket)
       const realHR = parseFloat(localStorage.getItem("heartRateValue")) || 75;
       const realSpO2 = parseFloat(localStorage.getItem("oxygenSaturationValue")) || 98;
       const realRR = parseFloat(localStorage.getItem("respiratoryRateValue")) || 20;
 
+      // Generate smooth EHR-like waveforms
       const hr = generateHeartRateWaveform(time, realHR);
       const rr = generateRespiratoryRateWaveform(time, realRR);
       const oxygen_saturation = generateOxygenSaturationWaveform(time, realSpO2);
+
       updateCharts(charts, hr, rr, oxygen_saturation);
+
+      // Store global time so right side charts can sync
       time++;
-    }, 100);
+      localStorage.setItem("global_time", time);
+    }, 200); // 200ms for smooth animation with lower CPU usage
   });
 </script>

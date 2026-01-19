@@ -1,7 +1,7 @@
 from flask import request, render_template, current_app, Blueprint, jsonify, redirect, url_for
 from werkzeug.utils import secure_filename
 import jwt
-from app.middleware.authenticate import token_required
+from app.middleware.authenticate import token_required, admin_required
 from app.services.gridfs_service import upload_file, delete_file, file_exists
 
 profile_ = Blueprint('profile', __name__)
@@ -32,44 +32,34 @@ def update_profile():
         email = payload["id"]
         newDoc = {"username": username}
         
-        print(f"[Profile Update] User: {email}, Username: {username}")
-        print(f"[Profile Update] Files in request: {list(request.files.keys())}")
-        
         if "filePict" in request.files:
             file = request.files["filePict"]
-            print(f"[Profile Update] File received: {file.filename}, size: {file.content_length}")
             if file.filename:
                 filename = secure_filename(file.filename)
                 extension = filename.split(".")[-1]
                 
                 # Generate unique filename for GridFS
                 gridfs_filename = f"profiles/{email.replace('@', '_at_').replace('.', '_')}.{extension}"
-                print(f"[Profile Update] Saving to GridFS as: {gridfs_filename}")
                 
                 # Delete existing profile picture if exists
                 if file_exists(gridfs_filename):
                     delete_file(gridfs_filename)
-                    print(f"[Profile Update] Deleted existing file: {gridfs_filename}")
                 
                 # Upload to GridFS
                 file_id = upload_file(file, gridfs_filename)
-                print(f"[Profile Update] Uploaded with ID: {file_id}")
                 
                 newDoc["profile"] = filename
                 newDoc["profilePict"] = gridfs_filename
-        else:
-            print("[Profile Update] No file in request")
             
         current_app.db.users.update_one(
             {"email": payload["id"]}, {"$set": newDoc})
-        print(f"[Profile Update] Database updated with: {newDoc}")
         return jsonify({"msg": "Profile successfully updated!"})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("profile"))
 
 
 @profile_.route('/user-management')
-@token_required
+@admin_required
 def user_management():
     all_users = list(current_app.db.users.find({}))
     myToken = request.cookies.get("mytoken")

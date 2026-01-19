@@ -79,7 +79,7 @@ def handle_get_vital(data):
         row = vital_data[index]
         emit('data_vital_patient', row)
 
-        socketio.sleep(5)
+        socketio.sleep(10)  # Balance between performance and responsiveness
 
         data_vital_patient[icustayid] = (
             index + 1
@@ -164,7 +164,7 @@ def handle_get_sofa(data):
                 }
             )
 
-        socketio.sleep(5)
+        socketio.sleep(10)  # Balance between performance and responsiveness
 
         data_sofa_patient[icustayid] = (
             index + 1

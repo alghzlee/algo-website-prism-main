@@ -141,6 +141,6 @@
         localStorage.getItem("clinicianAction");
       document.getElementById("recommendation_clinician_value_").innerText =
         localStorage.getItem("clinicianAction_");
-    }, 10);
+    }, 1000); // Changed from 10ms to 1000ms to reduce CPU usage
   });
 </script>

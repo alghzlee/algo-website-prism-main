@@ -1,7 +1,7 @@
 <!-- SOFA Score -->
 <section class="bg-cyan-500 dark:bg-cyan-900 text-white p-4 rounded-lg shadow-md h-[200px] flex flex-col">
   <h2 class="text-sm font-bold text-left mb-2">
-    Overall SOFA Score: <span id="sofa_score_value">3</span>
+    Overall SOFA Score: <span id="sofa_score_value">-</span>
   </h2>
   <div class="flex-1 flex flex-col items-center justify-between overflow-hidden">
     <!-- Grafik -->
@@ -12,27 +12,27 @@
     <div class="grid grid-cols-3 gap-2 text-[6px] text-center mt-1">
       <div>
         <span class="font-semibold">Renal:</span>
-        <span id="renal_value">3</span>
+        <span id="renal_value">-</span>
       </div>
       <div>
         <span class="font-semibold">Nervous:</span>
-        <span id="nervous_value">3</span>
+        <span id="nervous_value">-</span>
       </div>
       <div>
         <span class="font-semibold">Cardiovascular:</span>
-        <span id="cardiovascular_value">2</span>
+        <span id="cardiovascular_value">-</span>
       </div>
       <div>
         <span class="font-semibold">Liver:</span>
-        <span id="liver_value">1</span>
+        <span id="liver_value">-</span>
       </div>
       <div>
         <span class="font-semibold">Respiration:</span>
-        <span id="respiration_value">2</span>
+        <span id="respiration_value">-</span>
       </div>
       <div>
         <span class="font-semibold">Coagulation:</span>
-        <span id="coagulation_value">3</span>
+        <span id="coagulation_value">-</span>
       </div>
     </div>
   </div>
@@ -94,51 +94,28 @@
 
     socket.on("data_sofa_patient", (sofa_data) => {
       console.log("Received data sofa patient:", sofa_data);
-      charts.sofaScoreChart.data.datasets[0].data.push(sofa_data.sofa_score);
 
+      // Update chart
+      charts.sofaScoreChart.data.datasets[0].data.push(sofa_data.sofa_score);
       if (charts.sofaScoreChart.data.datasets[0].data.length > 25) {
         charts.sofaScoreChart.data.datasets[0].data.shift();
       }
       charts.sofaScoreChart.update();
 
-      localStorage.setItem(
-        "sofaScoreData",
-        JSON.stringify(charts.sofaScoreChart.data.datasets[0].data)
-      );
-      localStorage.setItem("sofaScoreValue", sofa_data.sofa_score);
-      localStorage.setItem("renalValue", sofa_data.renal);
-      localStorage.setItem("nervousValue", sofa_data.neurological);
-      localStorage.setItem("cardiovascularValue", sofa_data.cardiovascular);
-      localStorage.setItem("liverValue", sofa_data.liver);
-      localStorage.setItem("respirationValue", sofa_data.respiratory);
-      localStorage.setItem("coagulationValue", sofa_data.coagulation);
+      // Update SOFA Score display
+      document.getElementById("sofa_score_value").innerText = sofa_data.sofa_score || 0;
 
+      // Update individual component values directly
+      document.getElementById("renal_value").innerText = sofa_data.renal || 0;
+      document.getElementById("nervous_value").innerText = sofa_data.neurological || 0;
+      document.getElementById("cardiovascular_value").innerText = sofa_data.cardiovascular || 0;
+      document.getElementById("liver_value").innerText = sofa_data.liver || 0;
+      document.getElementById("respiration_value").innerText = sofa_data.respiratory || 0;
+      document.getElementById("coagulation_value").innerText = sofa_data.coagulation || 0;
+
+      // Show notification if critical
       showNotification(sofa_data.sofa_score);
-
-
     });
-
-
-    setInterval(() => {
-      charts.sofaScoreChart.data.datasets[0].data = JSON.parse(
-        localStorage.getItem("sofaScoreData")
-      );
-      charts.sofaScoreChart.update();
-      document.getElementById("sofa_score_value").innerText =
-        localStorage.getItem("sofaScoreValue");
-      document.getElementById("renal_value").innerText =
-        localStorage.getItem("renalValue");
-      document.getElementById("nervous_value").innerText =
-        localStorage.getItem("nervousValue");
-      document.getElementById("cardiovascular_value").innerText =
-        localStorage.getItem("cardiovascularValue");
-      document.getElementById("liver_value").innerText =
-        localStorage.getItem("liverValue");
-      document.getElementById("respiration_value").innerText =
-        localStorage.getItem("respirationValue");
-      document.getElementById("coagulation_value").innerText =
-        localStorage.getItem("coagulationValue");
-    }, 10);
   });
 
   let audio = null;

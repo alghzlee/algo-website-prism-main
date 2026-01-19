@@ -4,19 +4,19 @@
   <div class="flex items-center pt-1">
     <i class="mdi mdi-account text-2xl transition duration-75 text-cyan-500 mr-2"></i>
     <p class="dark:text-gray-300 text-gray-800 text-sm" id="name_value">
-      Adam Gilchrist
+      Loading...
     </p>
   </div>
   <div class="flex items-center pt-1">
     <i class="mdi mdi-run-fast text-2xl transition duration-75 text-cyan-500 mr-2"></i>
     <p class="dark:text-gray-300 text-gray-800 text-sm" id="age_value">
-      123 Kings Road Brisbane
+      Loading...
     </p>
   </div>
   <div class="flex items-center pt-1">
     <i class="mdi mdi-human-male-height text-2xl transition duration-75 text-cyan-500 mr-2"></i>
     <p class="dark:text-gray-300 text-gray-800 text-sm" id="body_period_vale">
-      Tue 3 Mar 2022
+      Loading...
     </p>
   </div>
   <img src="/assets/x-ray.png" alt="Patient Body" class="mx-auto my-16 h-80 mb-5 w-70" />
@@ -35,27 +35,11 @@
 
     socket.on("detail_patient_data", (patient_data) => {
       console.log("Received patient data:", patient_data);
-      localStorage.setItem(
-        "name",
-        patient_data.name
-      );
-      localStorage.setItem(
-        "age",
-        patient_data.age
-      );
-      localStorage.setItem(
-        "body_period",
-        patient_data.body_period
-      );
-    });
 
-    setInterval(() => {
-      document.getElementById("name_value").innerText =
-        localStorage.getItem("name");
-      document.getElementById("age_value").innerText =
-        localStorage.getItem("age");
-      document.getElementById("body_period_vale").innerText =
-        localStorage.getItem("body_period");
-    }, 10);
+      // Update DOM directly instead of using localStorage + setInterval
+      document.getElementById("name_value").innerText = patient_data.name || "Unknown";
+      document.getElementById("age_value").innerText = patient_data.age || "Unknown";
+      document.getElementById("body_period_vale").innerText = patient_data.body_period || "Unknown";
+    });
   });
 </script>
