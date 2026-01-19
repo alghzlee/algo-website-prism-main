@@ -1,11 +1,20 @@
+# =============================================================================
+# Docker Ignore - PRISM Railway Deployment
+# =============================================================================
+# NOTE: Files for TailwindCSS build (Stage 1) must NOT be ignored!
+# =============================================================================
+
 # Version Control
 .git
 .gitignore
 .github/
-# Environment
-.env
-.env.*
-# Python
+
+# Environment (IMPORTANT: Don't include .env in Docker image)
+<!-- .env
+.env.* -->
+!.env.example
+
+# Python Cache & Virtual Environments
 __pycache__/
 *.pyc
 *.pyo
@@ -16,42 +25,44 @@ venv/
 env/
 *.egg-info/
 *.egg
-# Node.js (Tailwind build tools)
+
+# Node.js - Only ignore node_modules, NOT package.json or source files
+# (needed for Stage 1 CSS build)
 node_modules/
-app/static/src/
-package.json
-package-lock.json
-tailwind.config.js
-# Jupyter & Data files
+
+# Jupyter & Data files (already in MongoDB GridFS)
 *.ipynb
 *.csv
 *.zip
-# Model files - SANGAT PENTING!
-# *.pt
-# *.pth
-# *.pkl
-# *.npy
-# *.h5
-# *.onnx
-# *.safetensors
+
 # IDE & OS
 .DS_Store
 .idea/
 .vscode/
 *.swp
 *.swo
+
 # Temp files
 tempCodeRunnerFile.py
 *.tmp
 *.log
-# Documentation
-*.md
+
+# Documentation (except README and deployment docs)
 !README.md
+!RAILWAY_DEPLOY.md
 readme.txt
-# Docker/CI
-Dockerfile*
+
+# Docker/CI (don't include Docker files in the image)
 docker-compose*
-.dockerignore
+
 # Development files
 *.docx
 upload_csv_to_mongo.py
+
+# Scripts folder (maintenance scripts, not needed in production)
+scripts/
+
+# Test files
+tests/
+*_test.py
+test_*.py
