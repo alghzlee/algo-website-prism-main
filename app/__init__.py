@@ -58,39 +58,25 @@ def create_app():
     def health_check():
         return {'status': 'ok', 'service': 'prism-api'}, 200
     
-    # PRELOAD ML MODELS - Optimized for Railway deployment
-    # Background preloading warms up worker & caches heavy libraries (torch, numpy)
-    # This significantly improves page load performance with eventlet worker
-    import threading
-    import time
+    # PRELOAD ML MODELS - Dengan preload_app=True, models di-load di master process
+    # Ini menghindari loading ulang setiap kali worker restart (timeout issue)
+    # Model akan di-share ke semua worker via fork (copy-on-write)
+    print("[Startup] Preloading ML models (master process)...")
     
-    def preload_ml_models():
-        """
-        Preload ML models in background thread with Railway-optimized strategy:
-        1. Wait 10s after startup (let health check pass first)
-        2. Load models with timeout protection
-        3. Warm up Python VM with heavy imports (torch, numpy)
-        """
-        try:
-            # Wait for health check to pass first (Railway timeout = 30s)
-            time.sleep(10)
-            print("[Startup] Background model preloading started (after health check)")
-            
-            from .routes.predict import get_model, get_physpol
-            
-            # Load models (also imports torch, numpy - warms up worker)
-            get_model()      # SAC Ensemble (122MB)
-            get_physpol()    # Physician policy
-            
-            print("[Startup] ✓ ML models preloaded successfully - worker ready!")
-            
-        except Exception as e:
-            # Non-fatal: models will lazy-load on first request
-            print(f"[Startup] Model preload failed (will lazy-load): {e}")
-    
-    # Start preloading in daemon thread (won't block shutdown)
-    preload_thread = threading.Thread(target=preload_ml_models, daemon=True)
-    preload_thread.start()
-    print("[Startup] Model preloading scheduled (background thread)")
+    try:
+        from .routes.predict import get_model, get_physpol
+        
+        # Load models SYNCHRONOUSLY di master process
+        print("[Startup] Loading SAC Ensemble (121.9 MB)...")
+        get_model()      # SAC Ensemble (122MB)
+        print("[Startup] Loading Physician Policy...")
+        get_physpol()    # Physician policy
+        
+        print("[Startup] ✓ ML models preloaded - ready to fork workers!")
+        
+    except Exception as e:
+        # Fatal: jika preload gagal, worker juga akan gagal
+        print(f"[Startup] ✗ Model preload FAILED: {e}")
+        raise
     
     return app
