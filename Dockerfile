@@ -47,4 +47,6 @@ RUN find /app -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true 
 EXPOSE 8080
 
 # Start command - Railway will set PORT env var
-CMD gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app
+# Note: timeout=300s (5min) allows model to load without worker kill
+# gunicorn.conf.py overrides these defaults if present
+CMD gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:$PORT --timeout 300 --graceful-timeout 30 --log-level debug --access-logfile - --error-logfile - wsgi:app

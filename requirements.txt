@@ -39,7 +39,9 @@ six==1.17.0
 
 # --- ML/AI (CPU-only PyTorch - CRITICAL for small image size!) ---
 # MUST install torch FIRST from CPU-only index to avoid CUDA version
-# Install separately: pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+# Installed via Dockerfile: pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.6.0+cpu
 
 # --- Model Storage ---
 huggingface_hub==0.28.1
