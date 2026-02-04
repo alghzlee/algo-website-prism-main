@@ -7,7 +7,7 @@ COPY package*.json ./
 COPY tailwind.config.js ./
 COPY app/templates ./app/templates
 COPY app/static/src/css/input.css ./app/static/src/css/input.css
-RUN npm ci --only=production
+RUN npm ci
 RUN npx tailwindcss -i ./app/static/src/css/input.css -o ./app/static/src/css/output.css --minify
 
 FROM python:3.11-slim
