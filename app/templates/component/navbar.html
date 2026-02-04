@@ -7,19 +7,8 @@
         class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-black dark:text-white">PRISM</span>
     </a>
 
-    <!-- Right side items (Model Status + Notification + Toggle + Avatar) - Always on the right -->
+    <!-- Right side items (Notification + Toggle + Avatar) - Always on the right -->
     <div class="flex items-center md:order-2 space-x-4 rtl:space-x-reverse">
-      <!-- Model Status Indicator (only visible while loading) -->
-      <div id="model-status-badge" class="hidden">
-        <div class="flex items-center px-3 py-1 bg-yellow-100 dark:bg-yellow-900 rounded-full">
-          <svg class="animate-spin h-4 w-4 text-yellow-600 dark:text-yellow-400 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span class="text-xs font-medium text-yellow-700 dark:text-yellow-300" id="model-status-text">Loading AI...</span>
-        </div>
-      </div>
-      
       <!-- Notifications -->
       <button id="dropdownNotificationButton" data-dropdown-toggle="dropdownNotification"
         class="relative inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white dark:text-gray-400">
@@ -282,52 +271,6 @@
           .addClass("dark:hover:bg-cyan-600 dark:hover:text-white");
       }
     });
-    
-    // Model Status Monitoring (Railway production only)
-    function checkModelStatus() {
-      $.ajax({
-        url: '/health/models',
-        method: 'GET',
-        success: function(data) {
-          const badge = $('#model-status-badge');
-          const text = $('#model-status-text');
-          
-          if (data.status === 'loading') {
-            // Show loading badge
-            badge.removeClass('hidden');
-            text.text(`Loading AI ${data.progress}%`);
-          } else if (data.status === 'ready') {
-            // Hide badge when ready
-            badge.addClass('hidden');
-          } else if (data.status === 'error') {
-            // Show error
-            badge.removeClass('hidden');
-            badge.find('div').removeClass('bg-yellow-100 dark:bg-yellow-900')
-                  .addClass('bg-red-100 dark:bg-red-900');
-            text.removeClass('text-yellow-700 dark:text-yellow-300')
-                .addClass('text-red-700 dark:text-red-300')
-                .text('AI Error');
-          }
-        },
-        error: function() {
-          // If endpoint not available, hide badge
-          $('#model-status-badge').addClass('hidden');
-        }
-      });
-    }
-    
-    // Check immediately on load
-    checkModelStatus();
-    
-    // Poll every 3 seconds while models are loading
-    const statusInterval = setInterval(function() {
-      checkModelStatus();
-    }, 3000);
-    
-    // Stop polling after 2 minutes (models should be loaded by then)
-    setTimeout(function() {
-      clearInterval(statusInterval);
-    }, 120000);
   });
 
   function logout() {

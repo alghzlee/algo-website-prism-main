@@ -85,11 +85,23 @@ def create_app():
         all_ready = all(m['status'] == 'ready' for m in [model_status['ensemble'], 
                                                            model_status['physician_policy'],
                                                            model_status['autoencoder']])
+        all_pending = all(m['status'] == 'pending' for m in [model_status['ensemble'], 
+                                                               model_status['physician_policy'],
+                                                               model_status['autoencoder']])
         any_error = any(m['status'] == 'error' for m in [model_status['ensemble'], 
                                                            model_status['physician_policy'],
                                                            model_status['autoencoder']])
         
-        overall_status = 'ready' if all_ready else ('error' if any_error else 'loading')
+        # If all models are pending (lazy-load mode), consider it 'ready' (will load on first use)
+        # This prevents UI badge from showing "Loading 0%" indefinitely
+        if all_pending:
+            overall_status = 'idle'  # New status: models not loaded yet, but ready to lazy-load
+        elif all_ready:
+            overall_status = 'ready'
+        elif any_error:
+            overall_status = 'error'
+        else:
+            overall_status = 'loading'
         
         return jsonify({
             'status': overall_status,

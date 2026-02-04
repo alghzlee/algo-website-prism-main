@@ -44,6 +44,7 @@
         url: "/predict-sac",
         contentType: "application/json",
         data: JSON.stringify(patient_data),
+        timeout: 180000,  // 3 minutes - ensure model has time to load on first request
         success: function (response) {
           console.log("AI Personalize", response.recommended_action_model_personalize);
           localStorage.setItem(
@@ -55,8 +56,11 @@
             response.recommended_action_model_personalize.vasopressor_dose
           );
         },
-        error: function (error) {
-          console.error("Terjadi kesalahan:", error.responseJSON.error);
+        error: function (xhr, status, error) {
+          console.error("AI prediction failed:", status, error);
+          // Set default values on error
+          localStorage.setItem("agentAction", "Loading...");
+          localStorage.setItem("agentAction_", "Loading...");
         },
       });
       dataInput = {
