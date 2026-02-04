@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./app/static/src/css/input.css -o ./app/static/src/css/output.css --minify",
+    "watch:css": "npx tailwindcss -i ./app/static/src/css/input.css -o ./app/static/src/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.15"
+  },
+  "dependencies": {
+    "flowbite": "^2.5.2"
+  }
+}

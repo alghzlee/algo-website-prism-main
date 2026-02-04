@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Asset Management | PRISM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='src/css/output.css') }}">
+    <style>
+        .drop-zone {
+            border: 2px dashed #4B5563;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .drop-zone.dragover {
+            border-color: #3B82F6;
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background-color: #1F2937;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover {
+            background-color: #374151;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .folder-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background-color: #374151;
+            border: 1px solid #4B5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .folder-btn:hover,
+        .folder-btn.active {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background-color: #10B981;
+        }
+
+        .toast.error {
+            background-color: #EF4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #374151;
+            border-top: 3px solid #3B82F6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </a>
+                <h1 class="text-xl font-bold">Asset Management</h1>
+            </div>
+            <div class="text-sm text-gray-400">
+                MongoDB GridFS Storage
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Upload Section -->
+        <section class="mb-8">
+            <h2 class="text-lg font-semibold mb-4">Upload Files</h2>
+
+            <!-- Folder Selection -->
+            <div class="mb-4">
+                <label class="block text-sm text-gray-400 mb-2">Select Folder:</label>
+                <div class="flex flex-wrap gap-2">
+                    <button class="folder-btn active" data-folder="">Root</button>
+                    <button class="folder-btn" data-folder="data">data/</button>
+                    <button class="folder-btn" data-folder="images/assets">images/assets/</button>
+                    <button class="folder-btn" data-folder="profiles">profiles/</button>
+                </div>
+            </div>
+
+            <!-- Drop Zone -->
+            <div id="dropZone" class="drop-zone">
+                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p class="text-gray-400 mb-2">Drag & drop files here or click to browse</p>
+                <p class="text-sm text-gray-500">Supports: .pt, .pth, .pkl, .npy, .csv, .json, .jpg, .png, .gif</p>
+                <input type="file" id="fileInput" multiple class="hidden">
+            </div>
+
+            <!-- Upload Progress -->
+            <div id="uploadProgress" class="mt-4 hidden">
+                <div class="flex items-center gap-3">
+                    <div class="loading-spinner"></div>
+                    <span id="uploadStatus">Uploading...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Files Browser -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold">Files in GridFS</h2>
+                <button id="refreshBtn"
+                    class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <button class="filter-btn folder-btn active" data-filter="">All</button>
+                <button class="filter-btn folder-btn" data-filter="data/">Data & Models</button>
+                <button class="filter-btn folder-btn" data-filter="images/">Images</button>
+                <button class="filter-btn folder-btn" data-filter="profiles/">Profiles</button>
+            </div>
+
+            <!-- File Count -->
+            <div id="fileCount" class="text-sm text-gray-400 mb-4">Loading...</div>
+
+            <!-- Files List -->
+            <div id="filesList" class="space-y-2">
+                <!-- Files will be populated here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-12">
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+                </svg>
+                <p class="text-gray-400">No files found</p>
+                <p class="text-sm text-gray-500">Upload files to get started</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // State
+        let currentFolder = '';
+        let currentFilter = '';
+        let allFiles = [];
+
+        // Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const filesList = document.getElementById('filesList');
+        const fileCount = document.getElementById('fileCount');
+        const emptyState = document.getElementById('emptyState');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        // Folder buttons
+        document.querySelectorAll('.folder-btn:not(.filter-btn)').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.folder-btn:not(.filter-btn)').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFolder = btn.dataset.folder;
+            });
+        });
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderFiles();
+            });
+        });
+
+        // Drop zone events
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', () => {
+            handleFiles(fileInput.files);
+            fileInput.value = '';
+        });
+
+        // Upload files
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+
+            uploadProgress.classList.remove('hidden');
+            uploadStatus.textContent = `Uploading ${files.length} file(s)...`;
+
+            const formData = new FormData();
+            for (let file of files) {
+                formData.append('file', file);
+            }
+            formData.append('folder', currentFolder);
+
+            try {
+                const response = await fetch('/admin/assets/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast(`Successfully uploaded ${data.count} file(s)`, 'success');
+                    loadFiles();
+                } else {
+                    showToast(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showToast('Upload failed: ' + error.message, 'error');
+            } finally {
+                uploadProgress.classList.add('hidden');
+            }
+        }
+
+        // Load files from server
+        async function loadFiles() {
+            try {
+                const response = await fetch('/admin/assets/list');
+                const data = await response.json();
+
+                if (data.success) {
+                    allFiles = data.files;
+                    renderFiles();
+                }
+            } catch (error) {
+                showToast('Failed to load files: ' + error.message, 'error');
+            }
+        }
+
+        // Render files list
+        function renderFiles() {
+            let filtered = allFiles;
+            if (currentFilter) {
+                filtered = allFiles.filter(f => f.filename.startsWith(currentFilter));
+            }
+
+            fileCount.textContent = `${filtered.length} file(s)`;
+
+            if (filtered.length === 0) {
+                filesList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            filesList.innerHTML = filtered.map(file => {
+                const icon = getFileIcon(file.filename);
+                const size = formatSize(file.size);
+                const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.filename);
+
+                return `
+          <div class="file-item" data-filename="${file.filename}">
+            <div class="flex items-center gap-3">
+              <div class="file-icon bg-gray-700">${icon}</div>
+              <div>
+                <div class="font-medium">${file.filename}</div>
+                <div class="text-sm text-gray-400">${size} • ${file.upload_date || 'Unknown date'}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              ${isImage ? `<a href="/assets/${file.filename}" target="_blank" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded text-sm">Preview</a>` : ''}
+              <a href="/assets/${file.filename}" target="_blank" class="px-3 py-1 bg-gray-600 hover:bg-gray-500 rounded text-sm">Download</a>
+              <button onclick="deleteFile('${file.filename}')" class="px-3 py-1 bg-red-600 hover:bg-red-500 rounded text-sm">Delete</button>
+            </div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        // Delete file
+        async function deleteFile(filename) {
+            if (!confirm(`Delete "${filename}"?`)) return;
+
+            try {
+                const response = await fetch('/admin/assets/delete', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('File deleted', 'success');
+                    loadFiles();
+                } else {
+                    showToast(data.error || 'Delete failed', 'error');
+                }
+            } catch (error) {
+                showToast('Delete failed: ' + error.message, 'error');
+            }
+        }
+
+        // Helpers
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+                'pt': '🧠', 'pth': '🧠', 'pkl': '📦',
+                'npy': '📊', 'csv': '📄', 'json': '📋',
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'webp': '🖼️',
+                'pdf': '📕'
+            };
+            return icons[ext] || '📁';
+        }
+
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Refresh button
+        refreshBtn.addEventListener('click', loadFiles);
+
+        // Initial load
+        loadFiles();
+    </script>
+</body>
+
+</html>

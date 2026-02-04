@@ -1,0 +1,303 @@
+<html>
+
+<head>
+  {% include 'component/header.html'%}
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let time = 0;
+      localStorage.setItem("global_time_predict", Math.round(time));
+      localStorage.setItem("global_time", Math.round(time));
+
+    });
+
+    function logout() {
+      $.ajax({
+        url: "/logout",
+        type: "DELETE",
+        success: function (response) {
+          Cookies.remove('mytoken', { path: '/' });
+          window.location.href = "/";
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+    }
+  </script>
+</head>
+
+<body class="dark:bg-gray-950 bg-gray-100">
+
+  {% set show_dashboard_menu = false %}
+  {% include 'component/navbar.html' %}
+
+
+  <div class="p-4 border-2 border-gray-100 border-dashed rounded-lg dark:border-gray-950 mt-6">
+    <div class="flex justify-between items-center mb-6">
+      <!-- Tab Bar -->
+      <ul class="flex flex-wrap text-sm mb-6 font-medium text-center text-gray-500 dark:text-gray-400">
+        <li class="me-2">
+          <a href="#" class="inline-block px-4 py-3 text-white bg-cyan-500 dark:bg-cyan-600 rounded-lg active"
+            aria-current="page">ICU 501</a>
+        </li>
+        <li>
+          <a class="inline-block px-4 py-3 text-gray-400 cursor-not-allowed dark:text-gray-500">ICU 502</a>
+        </li>
+        <li>
+          <a class="inline-block px-4 py-3 text-gray-400 cursor-not-allowed dark:text-gray-500">ICU 503</a>
+        </li>
+        <li>
+          <a class="inline-block px-4 py-3 text-gray-400 cursor-not-allowed dark:text-gray-500">ICU 504</a>
+        </li>
+        <li>
+          <a class="inline-block px-4 py-3 text-gray-400 cursor-not-allowed dark:text-gray-500">ICU 505</a>
+        </li>
+      </ul>
+
+      <!-- Search Bar - Lower z-index so dropdown appears above -->
+      <div class="w-64 sm:w-72 md:w-80 -mt-8 relative z-0">
+        <form class="max-w-md mx-auto">
+          <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search"
+              class="block w-full p-3 pl-10 text-sm text-gray-900 border border-cyan-300 rounded-lg bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-900 dark:border-cyan-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-400 dark:focus:border-cyan-400"
+              placeholder="Search..." required />
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- BED ICU -->
+    <div id="bed-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 mt-6">
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100001"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100001">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100001
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100001"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100002"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100002">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100002
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100002"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100003"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100003">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100003
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100003"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100004"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100004">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100004
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100004"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100005"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100005">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100005
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100005"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100006"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100006">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100006
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100006"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100007"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100007">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100007
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100007"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card Bed ICU -->
+      <div data-aos="zoom-in" data-aos-duration="300" data-bed-id="50100008"
+        class="bed-card bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-900 dark:border-gray-700 overflow-hidden">
+        <a href="/similarity/50100008">
+          <img class="w-full h-48 object-cover" src="/assets/bed-hospital.jpg" alt="Bed Hospital" />
+        </a>
+        <div class="p-4">
+          <h5 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">
+            Bed ICU 50100008
+          </h5>
+          <p class="mb-3 text-sm text-gray-700 dark:text-gray-400">
+            Bed ICU sudah terisi.
+          </p>
+          <a href="/similarity/50100008"
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:ring-cyan-500 dark:bg-cyan-600 dark:hover:bg-cyan-700 dark:focus:ring-cyan-400">
+            Detail
+            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M1 5h12m0 0L9 1m4 4L9 9" />
+            </svg>
+          </a>
+        </div>
+      </div>
+      <!-- End Card Bed ICU -->
+    </div>
+  </div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    // Search functionality for bed selection
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("default-search");
+      const bedCards = document.querySelectorAll(".bed-card");
+
+      searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+
+        bedCards.forEach((card) => {
+          const bedId = card.getAttribute("data-bed-id");
+          const bedTitle = card.querySelector("h5").textContent.toLowerCase();
+
+          // Show/hide card based on search term matching bed ID or title
+          if (bedId.includes(searchTerm) || bedTitle.includes(searchTerm)) {
+            card.style.display = "block";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

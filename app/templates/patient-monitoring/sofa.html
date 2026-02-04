@@ -1,0 +1,236 @@
+<!-- SOFA Score -->
+<section class="bg-cyan-500 dark:bg-cyan-900 text-white p-4 rounded-lg shadow-md h-[200px] flex flex-col">
+  <h2 class="text-sm font-bold text-left mb-2">
+    Overall SOFA Score: <span id="sofa_score_value">-</span>
+  </h2>
+  <div class="flex-1 flex flex-col items-center justify-between overflow-hidden">
+    <!-- Grafik -->
+    <div class="flex-1 flex items-center justify-center w-full">
+      <canvas id="sofaScore" class="w-[90%] h-[70px]"></canvas>
+    </div>
+    <!-- Detail Skor -->
+    <div class="grid grid-cols-3 gap-2 text-[6px] text-center mt-1">
+      <div>
+        <span class="font-semibold">Renal:</span>
+        <span id="renal_value">-</span>
+      </div>
+      <div>
+        <span class="font-semibold">Nervous:</span>
+        <span id="nervous_value">-</span>
+      </div>
+      <div>
+        <span class="font-semibold">Cardiovascular:</span>
+        <span id="cardiovascular_value">-</span>
+      </div>
+      <div>
+        <span class="font-semibold">Liver:</span>
+        <span id="liver_value">-</span>
+      </div>
+      <div>
+        <span class="font-semibold">Respiration:</span>
+        <span id="respiration_value">-</span>
+      </div>
+      <div>
+        <span class="font-semibold">Coagulation:</span>
+        <span id="coagulation_value">-</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function initializeSofaChart() {
+    const sofaScoreCtx = document.getElementById("sofaScore").getContext("2d");
+
+    // Start with dummy data (flat line like similar.html)
+    let initialData = Array.from({ length: 15 }, () => 5);
+    
+    // Load data from localStorage immediately if available
+    if (localStorage.getItem("sofaScoreData")) {
+      try {
+        const savedData = JSON.parse(localStorage.getItem("sofaScoreData"));
+        if (Array.isArray(savedData) && savedData.length > 0) {
+          initialData = savedData;
+        }
+      } catch (e) {
+        console.error("Failed to parse localStorage data:", e);
+      }
+    }
+
+    const sofaScoreChart = new Chart(sofaScoreCtx, {
+      type: "line",
+      data: {
+        labels: Array.from({ length: initialData.length }, () => ""),
+        datasets: [
+          {
+            borderColor: "white",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            data: initialData,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: {
+          point: { radius: 0 },
+        },
+      },
+    });
+
+    return { sofaScoreChart };
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const charts = initializeSofaChart();
+
+    // Restore last display values from localStorage
+    if (localStorage.getItem("sofa_score_value")) {
+      document.getElementById("sofa_score_value").innerText = localStorage.getItem("sofa_score_value");
+    }
+    if (localStorage.getItem("renal_value")) {
+      document.getElementById("renal_value").innerText = localStorage.getItem("renal_value");
+    }
+    if (localStorage.getItem("nervous_value")) {
+      document.getElementById("nervous_value").innerText = localStorage.getItem("nervous_value");
+    }
+    if (localStorage.getItem("cardiovascular_value")) {
+      document.getElementById("cardiovascular_value").innerText = localStorage.getItem("cardiovascular_value");
+    }
+    if (localStorage.getItem("liver_value")) {
+      document.getElementById("liver_value").innerText = localStorage.getItem("liver_value");
+    }
+    if (localStorage.getItem("respiration_value")) {
+      document.getElementById("respiration_value").innerText = localStorage.getItem("respiration_value");
+    }
+    if (localStorage.getItem("coagulation_value")) {
+      document.getElementById("coagulation_value").innerText = localStorage.getItem("coagulation_value");
+    }
+
+    const socket = io("/sofa_patient");
+
+    // Disconnect socket when user navigates away
+    window.addEventListener('beforeunload', () => {
+      socket.disconnect();
+    });
+
+    socket.on("connect", () => {
+      socket.emit("get_data_sofa_patient", { icustayid: "{{ bed_id }}" });
+    });
+
+    socket.on("disconnect", () => {
+      // Socket disconnected
+    });
+
+    socket.on("connect_error", (error) => {
+      console.error("SOFA connection error:", error);
+    });
+
+    socket.on("data_sofa_patient", (sofa_data) => {
+
+      if (sofa_data.error) {
+        console.warn("SOFA Data Error:", sofa_data.error);
+        return;
+      }
+
+      // Update chart - maintain sliding window of 25 data points
+      charts.sofaScoreChart.data.datasets[0].data.push(sofa_data.sofa_score);
+      if (charts.sofaScoreChart.data.datasets[0].data.length > 25) {
+        charts.sofaScoreChart.data.datasets[0].data.shift();
+      }
+      
+      // Update labels to match data length
+      charts.sofaScoreChart.data.labels = Array.from(
+        { length: charts.sofaScoreChart.data.datasets[0].data.length },
+        () => ""
+      );
+      
+      charts.sofaScoreChart.update();
+
+      // Save SOFA score history to localStorage for other components (like similar.html)
+      localStorage.setItem("sofaScoreData", JSON.stringify(charts.sofaScoreChart.data.datasets[0].data));
+
+      // Update SOFA Score display
+      const sofaScore = sofa_data.sofa_score || 0;
+      const renalValue = sofa_data.renal || 0;
+      const nervousValue = sofa_data.neurological || 0;
+      const cardiovascularValue = sofa_data.cardiovascular || 0;
+      const liverValue = sofa_data.liver || 0;
+      const respirationValue = sofa_data.respiratory || 0;
+      const coagulationValue = sofa_data.coagulation || 0;
+
+      document.getElementById("sofa_score_value").innerText = sofaScore;
+      document.getElementById("renal_value").innerText = renalValue;
+      document.getElementById("nervous_value").innerText = nervousValue;
+      document.getElementById("cardiovascular_value").innerText = cardiovascularValue;
+      document.getElementById("liver_value").innerText = liverValue;
+      document.getElementById("respiration_value").innerText = respirationValue;
+      document.getElementById("coagulation_value").innerText = coagulationValue;
+
+      // Save individual values to localStorage
+      localStorage.setItem("sofa_score_value", sofaScore);
+      localStorage.setItem("renal_value", renalValue);
+      localStorage.setItem("nervous_value", nervousValue);
+      localStorage.setItem("cardiovascular_value", cardiovascularValue);
+      localStorage.setItem("liver_value", liverValue);
+      localStorage.setItem("respiration_value", respirationValue);
+      localStorage.setItem("coagulation_value", coagulationValue);
+
+      // Show notification if critical
+      showNotification(sofa_data.sofa_score);
+    });
+  });
+
+  let audio = null;
+
+  function showNotification(sofaScore) {
+    if (sofaScore > 8) {
+      audio = new Audio('{{ url_for("static", filename="src/audio/notification.mp3") }}');
+      audio.play();
+
+      Swal.fire({
+        title: "Emergency!",
+        text: `Patient in room ICU this in critical condition`,
+        icon: "warning",
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        timer: 0,
+        customClass: {
+          title: "text-xl font-bold text-black dark:text-white",
+          content: "text-sm text-gray-700 dark:text-white",
+          popup: "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+        },
+      });
+
+      const checkCondition = setInterval(() => {
+        if (sofaScore <= 8) {
+          clearInterval(checkCondition);
+          Swal.close();
+          if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+        }
+      }, 100);
+    } else {
+      Swal.close();
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+  }
+
+
+</script>

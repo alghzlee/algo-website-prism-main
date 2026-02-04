@@ -1,0 +1,303 @@
+<!-- Vitals -->
+<section class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg">
+  <!-- Heart Rate -->
+  <div class="mb-2">
+    <!-- Ikon dan Judul -->
+    <div class="flex items-center justify-between mb-4">
+      <!-- Tambahkan ikon MDI -->
+      <div class="flex flex-col items-start">
+        <i class="mdi mdi-heart-pulse text-4xl text-red-500"></i>
+        <p class="text-[12px] mt-2 text-gray-900 dark:text-gray-200">
+          HEART RATE
+        </p>
+      </div>
+
+      <!-- Value -->
+      <div class="flex items-baseline">
+        <p class="text-4xl font-bold text-black dark:text-white" id="heart_rate_value">
+          60
+        </p>
+        <p class="text-sm text-black dark:text-white ml-1">bpm</p>
+      </div>
+    </div>
+    <!-- Grafik -->
+    <div>
+      <canvas id="heartRate" class="w-full h-40"></canvas>
+    </div>
+  </div>
+
+  <!-- Oxygen Saturation -->
+  <div class="mb-2">
+    <!-- Ikon dan Judul -->
+    <div class="flex items-center justify-between mb-4">
+      <!-- Tambahkan ikon MDI -->
+      <div class="flex flex-col items-start">
+        <i class="mdi mdi-heart-plus-outline text-4xl text-red-500"></i>
+        <p class="text-[12px] mt-2 text-gray-900 dark:text-gray-200">
+          OXYGEN SATURATION
+        </p>
+      </div>
+
+      <!-- Value -->
+      <div class="flex items-baseline">
+        <p class="text-4xl font-bold text-black dark:text-white" id="oxygen_saturation_value">
+          60
+        </p>
+        <p class="text-sm text-black dark:text-white ml-1">%</p>
+      </div>
+    </div>
+    <!-- Grafik -->
+    <div>
+      <canvas id="oxygenSaturation" class="w-full h-40"></canvas>
+    </div>
+  </div>
+
+  <!-- Respiratory Rate -->
+  <div class="mb-2">
+    <!-- Ikon dan Judul -->
+    <div class="flex items-center justify-between mb-4">
+      <!-- Tambahkan ikon MDI -->
+      <div class="flex flex-col items-start">
+        <i class="mdi mdi-lungs text-4xl text-red-500"></i>
+        <p class="text-[12px] mt-2 text-gray-900 dark:text-gray-200">
+          RESPIRATORY RATE
+        </p>
+      </div>
+      <!-- Value -->
+      <div class="flex items-baseline">
+        <p class="text-4xl font-bold text-black dark:text-white" id="respiratory_rate_value">
+          60
+        </p>
+        <p class="text-sm text-black dark:text-white ml-1">rpm</p>
+      </div>
+    </div>
+    <!-- Grafik -->
+    <div>
+      <canvas id="respiratoryRate" class="w-full h-40"></canvas>
+    </div>
+</section>
+
+<!-- Import shared waveform utilities -->
+<script src="{{ url_for('static', filename='src/js/waveform-utils.js') }}"></script>
+
+<script>
+  let time = localStorage.getItem("global_time") || 0;
+
+  function initializeChart() {
+    const heartRateCtx = document.getElementById("heartRate").getContext("2d");
+    const oxygenSaturationCtx = document
+      .getElementById("oxygenSaturation")
+      .getContext("2d");
+    const respiratoryRateCtx = document
+      .getElementById("respiratoryRate")
+      .getContext("2d");
+
+    const heartRateChart = new Chart(heartRateCtx, {
+      type: "line",
+      data: {
+        labels: Array.from({ length: 200 }, () => ""),
+        datasets: [
+          {
+            borderColor: "#9933FF",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            data: Array.from({ length: 200 }, () => 75),
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: {
+          point: { radius: 0 },
+        },
+      },
+    });
+
+    const oxygenSaturationChart = new Chart(oxygenSaturationCtx, {
+      type: "line",
+      data: {
+        labels: Array.from({ length: 200 }, () => ""),
+        datasets: [
+          {
+            borderColor: "#9933FF",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            data: Array.from({ length: 200 }, () => 98),
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: {
+          point: { radius: 0 },
+        },
+      },
+    });
+
+    const respiratoryRateChart = new Chart(respiratoryRateCtx, {
+      type: "line",
+      data: {
+        labels: Array.from({ length: 200 }, () => ""),
+        datasets: [
+          {
+            borderColor: "#9933FF",
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            data: Array.from({ length: 200 }, () => 20),
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: {
+          point: { radius: 0 },
+        },
+      },
+    });
+
+    return {
+      heartRateChart,
+      oxygenSaturationChart,
+      respiratoryRateChart,
+    };
+  }
+
+  function updateCharts(charts, hr, rr, oxygen_saturation) {
+    charts.heartRateChart.data.datasets[0].data.push(hr);
+    if (charts.heartRateChart.data.datasets[0].data.length > 200) {
+      charts.heartRateChart.data.datasets[0].data.shift();
+    }
+    charts.heartRateChart.update();
+
+    charts.oxygenSaturationChart.data.datasets[0].data.push(oxygen_saturation);
+    if (charts.oxygenSaturationChart.data.datasets[0].data.length > 200) {
+      charts.oxygenSaturationChart.data.datasets[0].data.shift();
+    }
+    charts.oxygenSaturationChart.update();
+
+    charts.respiratoryRateChart.data.datasets[0].data.push(rr);
+    if (charts.respiratoryRateChart.data.datasets[0].data.length > 200) {
+      charts.respiratoryRateChart.data.datasets[0].data.shift();
+    }
+    charts.respiratoryRateChart.update();
+
+    localStorage.setItem(
+      "heartRateData",
+      JSON.stringify(charts.heartRateChart.data.datasets[0].data)
+    );
+    localStorage.setItem(
+      "oxygenSaturationData",
+      JSON.stringify(charts.oxygenSaturationChart.data.datasets[0].data)
+    );
+    localStorage.setItem(
+      "respiratoryRateData",
+      JSON.stringify(charts.respiratoryRateChart.data.datasets[0].data)
+    );
+    localStorage.setItem("global_time", Math.round(time));
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const charts = initializeChart();
+
+    const heartRateData = localStorage.getItem("heartRateData");
+    const oxygenSaturationData = localStorage.getItem("oxygenSaturationData");
+    const respiratoryRateData = localStorage.getItem("respiratoryRateData");
+
+    if (heartRateData && heartRateData !== "undefined") {
+      charts.heartRateChart.data.datasets[0].data = JSON.parse(heartRateData);
+      charts.heartRateChart.update();
+    }
+    if (oxygenSaturationData && oxygenSaturationData !== "undefined") {
+      charts.oxygenSaturationChart.data.datasets[0].data =
+        JSON.parse(oxygenSaturationData);
+      charts.oxygenSaturationChart.update();
+    }
+    if (respiratoryRateData && respiratoryRateData !== "undefined") {
+      charts.respiratoryRateChart.data.datasets[0].data =
+        JSON.parse(respiratoryRateData);
+      charts.respiratoryRateChart.update();
+    }
+
+    const socket = io("/vital_patient");
+
+    // Disconnect socket when user navigates away
+    window.addEventListener('beforeunload', () => {
+      socket.disconnect();
+    });
+
+    socket.on("connect", () => {
+      console.log("Connected to data vital patient bed icu {{ bed_id }}");
+      socket.emit("get_data_vital_patient", { icustayid: "{{ bed_id }}" });
+    });
+
+    socket.on("data_vital_patient", (vital_data) => {
+      console.log("Received data vital patient:", vital_data);
+
+      // Extract values from MongoDB data
+      const hr = Math.round(vital_data.HR);
+      const spo2 = Math.round(vital_data.SpO2);
+      const rr = Math.round(vital_data.RR);
+
+      // Update localStorage for other components to use
+      localStorage.setItem("heartRateValue", hr);
+      localStorage.setItem("oxygenSaturationValue", spo2);
+      localStorage.setItem("respiratoryRateValue", rr);
+      localStorage.setItem(
+        "bloodPressureValue",
+        `${Math.round(vital_data.SysBP)}/${Math.round(vital_data.DiaBP)}`
+      );
+      localStorage.setItem("temperatureValue", Math.round(vital_data.Temp_C));
+
+      // Update display values immediately
+      document.getElementById("heart_rate_value").innerText = hr;
+      document.getElementById("oxygen_saturation_value").innerText = spo2;
+      document.getElementById("respiratory_rate_value").innerText = rr;
+    });
+
+    // Generate EHR-style waveform animation using MongoDB values as baseline
+    // Uses global_time from localStorage so left & right charts stay in sync
+    setInterval(() => {
+      const realHR = parseFloat(localStorage.getItem("heartRateValue")) || 75;
+      const realSpO2 = parseFloat(localStorage.getItem("oxygenSaturationValue")) || 98;
+      const realRR = parseFloat(localStorage.getItem("respiratoryRateValue")) || 20;
+
+      // Generate smooth EHR-like waveforms
+      const hr = generateHeartRateWaveform(time, realHR);
+      const rr = generateRespiratoryRateWaveform(time, realRR);
+      const oxygen_saturation = generateOxygenSaturationWaveform(time, realSpO2);
+
+      updateCharts(charts, hr, rr, oxygen_saturation);
+
+      // Store global time so right side charts can sync
+      time++;
+      localStorage.setItem("global_time", time);
+    }, 200);
+  });
+</script>

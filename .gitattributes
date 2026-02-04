@@ -1,0 +1,3 @@
+app/data/*.npy !text !filter !merge !diff
+app/data/*.pth !text !filter !merge !diff
+app/data/*.pt !text !filter !merge !diff

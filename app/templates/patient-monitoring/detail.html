@@ -1,0 +1,45 @@
+<!-- Patient Details -->
+<section class="col-span-1 md:col-span-2 lg:col-span-1 dark:bg-gray-900 bg-white p-4 rounded-lg">
+  <h2 class="text-lg font-bold text-black dark:text-white mb-4">Patient Details</h2>
+  <div class="flex items-center pt-1">
+    <i class="mdi mdi-account text-2xl transition duration-75 text-cyan-500 mr-2"></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="name_value">
+      Loading...
+    </p>
+  </div>
+  <div class="flex items-center pt-1">
+    <i class="mdi mdi-run-fast text-2xl transition duration-75 text-cyan-500 mr-2"></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="age_value">
+      Loading...
+    </p>
+  </div>
+  <div class="flex items-center pt-1">
+    <i class="mdi mdi-human-male-height text-2xl transition duration-75 text-cyan-500 mr-2"></i>
+    <p class="dark:text-gray-300 text-gray-800 text-sm" id="body_period_vale">
+      Loading...
+    </p>
+  </div>
+  <img src="/assets/x-ray.png" alt="Patient Body" class="mx-auto my-16 h-80 mb-5 w-70" />
+
+
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const socket = io("/detail_patient");
+
+    socket.on("connect", () => {
+      console.log("Connected to detail patient bed icu {{ bed_id }}");
+      socket.emit("get_detail_patient", { icustayid: "{{ bed_id }}" });
+    });
+
+    socket.on("detail_patient_data", (patient_data) => {
+      console.log("Received patient data:", patient_data);
+
+      // Update DOM directly instead of using localStorage + setInterval
+      document.getElementById("name_value").innerText = patient_data.name || "Unknown";
+      document.getElementById("age_value").innerText = patient_data.age || "Unknown";
+      document.getElementById("body_period_vale").innerText = patient_data.body_period || "Unknown";
+    });
+  });
+</script>

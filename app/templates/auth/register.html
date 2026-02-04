@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% include 'component/header.html'%}
+  {% set show_dashboard_menu = false %}
+  {% include 'component/navbar.html' %}
+
+  <script>
+    function is_nickname(asValue) {
+      var regExp = /^(?=.*[a-zA-Z])[-a-zA-Z0-9_.]{2,10}$/;
+      return regExp.test(asValue);
+    }
+
+    function is_password(asValue) {
+      let regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
+      return regExp.test(asValue);
+    }
+
+    function register() {
+      let username = $("#username").val();
+      let email = $("#email").val();
+      let password = $("#password").val();
+      let role = $("#selectedRoleInput").val();
+      let address = $("#address").val();
+      let confirmPassword = $("#confirmPassword").val();
+      let isChecked = $("#checkInput").prop("checked");
+      let firstName = $("#first_name").val();
+      let lastName = $("#last_name").val();
+      let phone = $("#phone").val();
+
+      if (username === "") {
+        $("#helpUsername")
+          .text("Please enter your username!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#username").focus();
+        return;
+      }
+
+      if (username != "") {
+        $("#helpUsername")
+          .text("")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+      }
+
+      if (email === "") {
+        $("#helpEmail")
+          .text("Please enter your email!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#email").focus();
+        return;
+      }
+
+      if (email != "") {
+        $("#helpEmail").text("").removeClass("is-safe").addClass("is-danger");
+      }
+
+      if (is_nickname(email)) {
+        $("#helpEmail")
+          .text("Please enter your email!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#email").focus();
+        return;
+      }
+
+      if (!role || role === "") {
+        Swal.fire({
+          icon: "warning",
+          title: "Role Required",
+          text: "Please select a role before registering!",
+          confirmButtonText: "Ok",
+          customClass: {
+            title: "text-xl font-bold text-black dark:text-white",
+            content: "text-sm text-gray-700 dark:text-white",
+            confirmButton:
+              "px-6 py-2 rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900 dark:hover:text-white",
+            popup:
+              "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+          },
+        });
+        return;
+      }
+
+      if (password === "") {
+        $("#helpPassword")
+          .text("Please enter your password!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#password").focus();
+        return;
+      }
+
+      if (password != "") {
+        $("#helpPassword")
+          .text("")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+      }
+
+      if (!is_password(password)) {
+        $("#helpPassword")
+          .text(
+            "Password must be 8-20 characters, numbers, or special characters (!@#$%^&*)!"
+          )
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#password").focus();
+        return;
+      }
+
+      if (confirmPassword === "") {
+        $("#helpConfirmPassword")
+          .text("Please enter Confirm Password!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#confirmPassword").focus();
+        return;
+      }
+
+      if (confirmPassword != "") {
+        $("#helpConfirmPassword")
+          .text("")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+      }
+
+      if (confirmPassword != password) {
+        $("#helpConfirmPassword")
+          .text("Password does not match!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#confirmPassword").focus();
+        return;
+      }
+
+      if (address === "") {
+        $("#helpAddress")
+          .text("Please enter your address!")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+        $("#address").focus();
+        return;
+      }
+
+      if (address != "") {
+        $("#helpAddress")
+          .text("")
+          .removeClass("is-safe")
+          .addClass("is-danger");
+      }
+
+      if (!isChecked) {
+        Swal.fire({
+          icon: "info",
+          title: "",
+          text: "Please click agree to terms & conditions",
+          confirmButtonText: "Ok",
+          customClass: {
+            title: "text-xl font-bold text-black dark:text-white",
+            content: "text-sm text-gray-700 dark:text-white",
+            confirmButton:
+              "px-6 py-2 rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900 dark:hover:text-white",
+            popup:
+              "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+          },
+        }).then(() => {
+          if (result.isConfirmed) {
+            return;
+          }
+        });
+        return;
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "/sign-up/save",
+        data: {
+          username: username,
+          email: email,
+          password: password,
+          role: role,
+          address: address,
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone,
+        },
+        success: function (response) {
+          if (response["exists"]) {
+            Swal.fire({
+              title: "Register Failed!",
+              text: "Email has been used!",
+              icon: "info",
+              confirmButtonText: "Oke",
+              customClass: {
+                title: "text-xl font-bold text-black dark:text-white",
+                content: "text-sm text-gray-700 dark:text-white",
+                confirmButton:
+                  "px-6 py-2 rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900 dark:hover:text-white",
+                popup:
+                  "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $("#helpEmail")
+                  .text("Email has been used!")
+                  .removeClass("is-safe")
+                  .addClass("is-danger");
+                $("#email").focus();
+              }
+            });
+          } else {
+            Swal.fire({
+              title: "Register Success!",
+              text: `Account created successfully Username "${email}" Password "${password}"`,
+              icon: "success",
+              confirmButtonText: "Oke",
+              customClass: {
+                title: "text-xl font-bold text-black dark:text-white",
+                content: "text-sm text-gray-700 dark:text-white",
+                confirmButton:
+                  "px-6 py-2 rounded-lg text-white bg-cyan-500 hover:bg-cyan-600 focus:outline-none dark:bg-cyan-900 dark:hover:bg-cyan-600 dark:focus:ring-cyan-900 dark:hover:text-white",
+                popup:
+                  "bg-gray-100 dark:bg-gray-900 border-none rounded-lg shadow-lg",
+              },
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.replace("/sign-up");
+              }
+            });
+          }
+        },
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-950 px-6 py-8 flex items-center justify-center">
+    <div
+      class="w-full max-w-6xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow my-4">
+      <form class="space-y-6 p-8" onsubmit="event.preventDefault(); register();">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+            User Registration – PRISM
+          </h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Please complete the form below to create a new account
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div>
+            <label for="first_name" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">First
+              name</label>
+            <input type="text" id="first_name"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="John" required />
+          </div>
+          <div>
+            <label for="last_name" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Last
+              Name</label>
+            <input id="last_name" type="text"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Doe" required>
+          </div>
+          <div>
+            <label for="phone" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Phone
+              Number</label>
+            <input id="phone" type="tel"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="08123456789" required>
+          </div>
+          <div>
+            <label for="username"
+              class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+            <input id="username" type="text"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Username" required>
+            <p id="helpUsername" class="text-sm text-red-500 mt-1"></p>
+          </div>
+          <div class="xl:col-span-2">
+            <label for="address" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+            <input id="address" type="text"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Full address" required>
+            <p id="helpAddress" class="text-sm text-red-500 mt-1"></p>
+          </div>
+
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="email" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+            <input id="email" type="email"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="email@example.com" required>
+            <p id="helpEmail" class="text-sm text-red-500 mt-1"></p>
+          </div>
+          <div class="relative">
+            <label for="dropdownRoleButton"
+              class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Role</label>
+            <button type="button" id="dropdownRoleButton"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white border border-blue-600 px-3 py-2.5 rounded-lg flex justify-between items-center text-sm leading-5">
+              <span id="selectedRoleText">Select Role</span>
+              <span>▼</span>
+            </button>
+            <input type="hidden" id="selectedRoleInput">
+            <div id="dropdownRole"
+              class="hidden absolute w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg mt-1 z-10 border border-gray-200 dark:border-gray-600">
+              <a href="#" data-role="Admin"
+                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                Admin
+              </a>
+              <a href="#" data-role="User"
+                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white">
+                User
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="password"
+              class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+            <input id="password" type="password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="•••••••••" required>
+            <p id="helpPassword" class="text-sm text-red-500 mt-1"></p>
+          </div>
+          <div>
+            <label for="confirmPassword" class="block mb-2.5 text-sm font-medium text-gray-900 dark:text-white">Confirm
+              Password</label>
+            <input id="confirmPassword" type="password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-3 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="•••••••••" required>
+            <p id="helpConfirmPassword" class="text-sm text-red-500 mt-1"></p>
+          </div>
+        </div>
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input id="checkInput" type="checkbox" value=""
+              class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+              required />
+          </div>
+          <label for="checkInput" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+            I agree to
+            <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Terms</a>
+            &
+            <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">Privacy Policy</a>
+          </label>
+        </div>
+        <div>
+          <button type="submit"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.getElementById("dropdownRoleButton").addEventListener("click", function () {
+      document.getElementById("dropdownRole").classList.toggle("hidden");
+    });
+
+    document.querySelectorAll("#dropdownRole a").forEach(item => {
+      item.addEventListener("click", function (e) {
+        e.preventDefault();
+        const role = this.getAttribute("data-role");
+        document.getElementById("selectedRoleText").textContent = role;
+        document.getElementById("selectedRoleInput").value = role;
+        document.getElementById("dropdownRole").classList.add("hidden");
+      });
+    });
+  </script>
+</body>
+
+
+</html>

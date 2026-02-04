@@ -1,0 +1,357 @@
+<html>
+
+<head>
+  {% include 'component/header.html'%}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let time = 0;
+      localStorage.setItem("global_time_predict", Math.round(time));
+      localStorage.setItem("global_time", Math.round(time));
+
+    });
+
+    function logout() {
+      $.ajax({
+        url: "/logout",
+        type: "DELETE",
+        success: function (response) {
+          Cookies.remove('mytoken', { path: '/' });
+          window.location.href = "/";
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+    }
+  </script>
+</head>
+
+<body class="dark:bg-gray-950 bg-gray-100">
+  {% set show_dashboard_menu = false %}
+  {% include 'component/navbar.html' %}
+
+  <div class="p-4 border-2 border-gray-100 border-dashed rounded-lg dark:border-gray-950 mt-6">
+    <div class="flex justify-between items-center mb-6">
+      <!-- Tab Bar -->
+      <!-- Search Bar -->
+      <div class="w-64 sm:w-72 md:w-80 -mt-8">
+        <form class="max-w-md mx-auto">
+          <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search"
+              class="block w-full p-3 pl-10 text-sm text-gray-900 border border-cyan-300 rounded-lg bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-900 dark:border-cyan-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-cyan-400 dark:focus:border-cyan-400"
+              placeholder="Search..." required />
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="flex space-x-2">
+      <!-- Card Detail - Modern Glassmorphism Design -->
+      <div id="profileCard" class="w-1/3 hidden transform transition-all ease-in-out duration-500 opacity-0">
+        <!-- Card with gradient background and glassmorphism -->
+        <div class="relative overflow-hidden rounded-2xl border-2 border-cyan-300 dark:border-cyan-600">
+          <div class="relative bg-white dark:bg-gray-900 rounded-xl p-6">
+            <!-- Close button -->
+            <button onclick="hideCard()"
+              class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-white transition-all duration-200">
+              <i class="mdi mdi-close text-lg"></i>
+            </button>
+
+            <!-- Profile Image with Ring -->
+            <div class="flex justify-center mb-4">
+              <div class="relative">
+                <div class="w-28 h-28 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 p-1">
+                  <img id="cardProfileImage" src="" alt="Profile Picture"
+                    class="w-full h-full object-cover rounded-full border-4 border-white/30" />
+                </div>
+                <!-- Online indicator -->
+                <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-3 border-white rounded-full"></div>
+              </div>
+            </div>
+
+            <!-- User Info Section -->
+            <div class="text-center mb-6">
+              <h2 id="cardName" class="text-2xl font-bold text-gray-900 dark:text-white mb-1"></h2>
+              <p id="cardEmail" class="text-gray-500 dark:text-gray-400 text-sm"></p>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="space-y-3 mb-6">
+              <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+                  <i class="mdi mdi-account-box text-xl text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Full Name</p>
+                  <p id="cardFullName" class="text-gray-900 dark:text-white font-medium"></p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-cyan-100 dark:bg-cyan-900/50">
+                  <i class="mdi mdi-shield-account text-xl text-cyan-600 dark:text-cyan-400"></i>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Role</p>
+                  <p id="cardRole" class="text-gray-900 dark:text-white font-medium"></p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
+                  <i class="mdi mdi-phone text-xl text-green-600 dark:text-green-400"></i>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Phone</p>
+                  <p id="cardPhone" class="text-gray-900 dark:text-white font-medium"></p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
+                  <i class="mdi mdi-map-marker text-xl text-purple-600 dark:text-purple-400"></i>
+                </div>
+                <div>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Address</p>
+                  <p id="cardAddress" class="text-gray-900 dark:text-white font-medium"></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+              <button id="cardDeleteBtn" onclick="deleteCardUser()"
+                class="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-red-500/80 hover:bg-red-500 font-medium transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30">
+                <i class="mdi mdi-delete-outline text-lg text-black dark:text-white"></i>
+                <span class="text-black dark:text-white">Delete User</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex w-full gap-4 transition-all duration-500 ease-in-out" id="userLayout">
+        <!-- Table User -->
+        <div id="tableContainer" class="transition-all duration-500 ease-in-out w-full">
+          <div
+            class="overflow-x-auto w-full bg-white border border-cyan-300 dark:border-cyan-600 rounded-xl shadow-lg dark:bg-gray-900">
+            <!-- Table Header -->
+            <div class="bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 rounded-t-xl">
+              <h3 class="text-lg font-semibold flex items-center gap-2">
+                <i class="mdi mdi-account-group text-xl text-black dark:text-white"></i>
+                <span class="text-black dark:text-white">User Management</span>
+              </h3>
+            </div>
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    #</th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    User</th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Email</th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Role</th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Phone</th>
+                  <th
+                    class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Address</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for user in users %}
+                <tr
+                  class="cursor-pointer transition-all duration-200 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:shadow-md"
+                  data-name="{{ user.get('username', '') }}" data-email="{{ user.get('email', '') }}"
+                  data-role="{{ user.get('role', '') }}" data-phone="{{ user.get('phone', '') }}" data-address="{{ user.get('address', '') }}"
+                  data-first-name="{{ user.get('first_name', '') }}" data-last-name="{{ user.get('last_name', '') }}"
+                  data-profile="{% if user.get('profilePict', '').startswith('http') %}{{ user.get('profilePict') }}{% else %}/assets/{{ user.get('profilePict', 'profiles/default.png') }}{% endif %}">
+                  <td class="px-6 py-4">
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ loop.index }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <img
+                        src="{% if user.get('profilePict', '').startswith('http') %}{{ user.get('profilePict') }}{% else %}/assets/{{ user.get('profilePict', 'profiles/default.png') }}{% endif %}"
+                        alt="Avatar"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-cyan-300 dark:border-cyan-600"
+                        onerror="this.src='https://ui-avatars.com/api/?name={{ user.get('username', 'User') }}&background=0891b2&color=fff&size=128'">
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">{{ user.get('username', 'N/A')
+                        }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-sm text-gray-600 dark:text-gray-300">{{ user.get('email', 'N/A') }}</span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                      {% if user.get('role', '').lower() == 'admin' %}
+                      bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300
+                      {% else %}
+                      bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300
+                      {% endif %}">
+                      <i
+                        class="mdi {% if user.get('role', '').lower() == 'admin' %}mdi-shield-crown{% else %}mdi-account{% endif %} mr-1"></i>
+                      {{ user.get('role', 'N/A') }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                      <i class="mdi mdi-phone text-gray-400"></i>
+                      {{ user.get('phone', 'N/A') }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                      <i class="mdi mdi-map-marker text-gray-400"></i>
+                      {{ user.get('address', 'N/A') }}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    // Search functionality for user management table
+    const searchInput = document.getElementById("default-search");
+    const tableRows = document.querySelectorAll("tbody tr");
+
+    searchInput.addEventListener("input", (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      tableRows.forEach((row) => {
+        const name = row.getAttribute("data-name")?.toLowerCase() || "";
+        const email = row.getAttribute("data-email")?.toLowerCase() || "";
+        const role = row.getAttribute("data-role")?.toLowerCase() || "";
+        const phone = row.getAttribute("data-phone")?.toLowerCase() || "";
+        const address = row.getAttribute("data-address")?.toLowerCase() || "";
+
+        // Show/hide row based on search term matching any field
+        if (name.includes(searchTerm) || email.includes(searchTerm) ||
+          role.includes(searchTerm) || phone.includes(searchTerm) || address.includes(searchTerm)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+
+    document.querySelectorAll("tbody tr").forEach((row) => {
+      row.addEventListener("click", function () {
+        const name = row.getAttribute("data-name");
+        const email = row.getAttribute("data-email");
+        const role = row.getAttribute("data-role");
+        const phone = row.getAttribute("data-phone");
+        const address = row.getAttribute("data-address");
+        const firstName = row.getAttribute("data-first-name");
+        const lastName = row.getAttribute("data-last-name");
+        const profile = row.getAttribute("data-profile");
+
+        const fullName = (firstName && lastName) ? `${firstName} ${lastName}` : (firstName || lastName || 'N/A');
+
+        document.getElementById("cardName").textContent = name;
+        document.getElementById("cardEmail").textContent = email;
+        document.getElementById("cardRole").textContent = role;
+        document.getElementById("cardPhone").textContent = phone || 'N/A';
+        document.getElementById("cardAddress").textContent = address;
+        document.getElementById("cardFullName").textContent = fullName;
+        document.getElementById("cardProfileImage").src = profile;
+
+        const deleteBtn = document.getElementById("cardDeleteBtn");
+        deleteBtn.setAttribute("data-email", row.getAttribute("data-email"));
+
+
+        const card = document.getElementById("profileCard");
+        card.classList.remove("hidden");
+        setTimeout(() => {
+          card.classList.remove("-translate-x-full", "opacity-0");
+          card.classList.add("translate-x-0", "opacity-100");
+        }, 10);
+      });
+    });
+
+    function hideCard() {
+      const card = document.getElementById("profileCard");
+      card.classList.remove("translate-x-0", "opacity-100");
+      card.classList.add("-translate-x-full", "opacity-0");
+      setTimeout(() => {
+        card.classList.add("hidden");
+      }, 500);
+    }
+
+    function deleteCardUser() {
+      const button = document.getElementById("cardDeleteBtn");
+      const email = button.getAttribute("data-email");
+
+      console.log("Preparing to delete user with ID:", email);
+
+      if (!email) {
+        Swal.fire("Error", "Email not found.", "error");
+        return;
+      }
+
+      Swal.fire({
+        title: "Are you sure?",
+        text: `User with email "${email}" will be permanently deleted!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        customClass: {
+          title: "text-xl font-bold text-black dark:text-white",
+          content: "text-sm text-gray-700 dark:text-white",
+          confirmButton: "px-4 py-2 rounded bg-red-600 text-white",
+          cancelButton: "px-4 py-2 rounded bg-gray-300 text-black",
+          popup: "bg-white dark:bg-gray-800 rounded-lg shadow-md",
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            type: "DELETE",
+            url: `/users/delete/email/${encodeURIComponent(email)}`,
+            success: function (response) {
+              Swal.fire({
+                title: "Deleted!",
+                text: "User has been deleted.",
+                icon: "success",
+                confirmButtonText: "OK"
+              }).then(() => {
+                location.reload();
+              });
+            },
+            error: function (xhr) {
+              console.error("Delete failed:", xhr.responseText);
+              Swal.fire("Failed", "Failed to delete user.", "error");
+            }
+          });
+        }
+      });
+    }
+  </script>
+
+</body>
+
+</html>

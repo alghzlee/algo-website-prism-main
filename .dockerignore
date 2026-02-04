@@ -1,0 +1,63 @@
+# Docker Ignore - PRISM Railway Deployment
+# Version Control - IMPORTANT: exclude .git (14MB+)
+.git/
+.git
+.gitignore
+.github/
+
+# Python Virtual Environments - IMPORTANT: exclude venv (847MB+)
+venv/
+.venv/
+env/
+.Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# Node.js (only node_modules, NOT package.json/tailwind for CSS build)
+node_modules/
+
+# Jupyter & Large data files
+*.ipynb
+*.csv
+*.zip
+
+# IDE & OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp files
+tempCodeRunnerFile.py
+*.tmp
+*.log
+
+# Documentation
+*.md
+!README.md
+!RAILWAY_DEPLOY.md
+readme.txt
+*.docx
+
+# Development files
+upload_csv_to_mongo.py
+scripts/
+templates/admin/
+
+# Test files
+tests/
+*_test.py
+test_*.py
+
+# Media files (not needed in production)
+*.md
+*.png
+*.jpg
+*.jpeg
+*.gif
+!app/static/src/images/assets/*
