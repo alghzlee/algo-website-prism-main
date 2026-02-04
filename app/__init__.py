@@ -111,18 +111,36 @@ def create_app():
     
     def preload_ml_models():
         """
-        Preload ML models in background with real-time status tracking:
-        1. Non-blocking startup (Railway health check passes immediately)
-        2. Download + load models with progress updates
-        3. Update global model_status for monitoring
+        Preload ML models in background with real-time status tracking.
+        
+        DISABLED for Railway deployment due to worker timeout issues:
+        - PyTorch model loading (122MB) takes >2 minutes on Railway free tier
+        - Causes Gunicorn WORKER TIMEOUT and SIGKILL
+        - Models will lazy-load on first request instead
+        
+        TODO: Re-enable when using Railway Pro with more memory/CPU
         """
         global model_status
         
         try:
-            # Only in production to avoid blocking local dev
+            # DISABLED: Skip preloading in production to avoid worker timeout
             if not os.environ.get('RAILWAY_ENVIRONMENT'):
                 return
             
+            # Mark all models as skipped (will lazy-load)
+            print(f"[{datetime.utcnow().strftime('%H:%M:%S')}] ⚠️  Model preloading DISABLED")
+            print(f"[{datetime.utcnow().strftime('%H:%M:%S')}] Models will lazy-load on first request")
+            
+            model_status['ensemble']['status'] = 'pending'
+            model_status['ensemble']['message'] = 'Will lazy-load on first request'
+            model_status['physician_policy']['status'] = 'pending'
+            model_status['physician_policy']['message'] = 'Will lazy-load on first request'
+            model_status['autoencoder']['status'] = 'pending'
+            model_status['autoencoder']['message'] = 'Will lazy-load on first request'
+            
+            return  # EXIT EARLY - Don't preload
+            
+            # === ORIGINAL PRELOAD CODE (CURRENTLY DISABLED) ===
             import eventlet
             
             # Short delay to let Flask finish startup (non-blocking)
