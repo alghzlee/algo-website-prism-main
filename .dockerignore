@@ -17,6 +17,19 @@ __pycache__/
 *.egg-info/
 *.egg
 
+# Model Files - CRITICAL: exclude all model files (will download from HF)
+app/data/*.pt
+app/data/*.pth
+app/data/*.npy
+app/data/best_*
+app/data/agent_*
+app/data/phys_*
+app/data/.cache/
+
+# Keep only small files needed for runtime
+!app/data/*.py
+!app/data/*.pkl
+
 # Node.js (only node_modules, NOT package.json/tailwind for CSS build)
 node_modules/
 
