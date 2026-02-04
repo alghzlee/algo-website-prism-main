@@ -58,22 +58,25 @@ def create_app():
     def health_check():
         return {'status': 'ok', 'service': 'prism-api'}, 200
     
-    # PRELOAD ML MODELS - Optimized for Railway deployment
+    # PRELOAD ML MODELS - Optimized for Railway deployment with eventlet
     # Background preloading warms up worker & caches heavy libraries (torch, numpy)
-    # This significantly improves page load performance with eventlet worker
-    import threading
-    import time
+    # Uses eventlet.spawn instead of threading to avoid conflicts
+    import os
     
     def preload_ml_models():
         """
-        Preload ML models in background thread with Railway-optimized strategy:
+        Preload ML models in background using eventlet greenthread:
         1. Wait 10s after startup (let health check pass first)
         2. Load models with timeout protection
         3. Warm up Python VM with heavy imports (torch, numpy)
         """
         try:
-            # Wait for health check to pass first (Railway timeout = 30s)
-            time.sleep(10)
+            # Only in production to avoid blocking local dev
+            if not os.environ.get('RAILWAY_ENVIRONMENT'):
+                return
+            
+            import eventlet
+            eventlet.sleep(10)  # Wait for health check first
             print("[Startup] Background model preloading started (after health check)")
             
             from .routes.predict import get_model, get_physpol
@@ -88,9 +91,11 @@ def create_app():
             # Non-fatal: models will lazy-load on first request
             print(f"[Startup] Model preload failed (will lazy-load): {e}")
     
-    # Start preloading in daemon thread (won't block shutdown)
-    preload_thread = threading.Thread(target=preload_ml_models, daemon=True)
-    preload_thread.start()
+    # Start preloading in eventlet greenthread (production only)
+    import os
+    if os.environ.get('RAILWAY_ENVIRONMENT'):
+        import eventlet
+        eventlet.spawn(preload_ml_models)
     print("[Startup] Model preloading scheduled (background thread)")
     
     return app
