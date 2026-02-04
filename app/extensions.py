@@ -1,13 +1,9 @@
 from flask_socketio import SocketIO
 from pymongo import MongoClient
 import gridfs
-import os
 
-# Socket.IO instance with production-compatible async_mode
-# Uses 'eventlet' in production (Gunicorn + eventlet worker)
-# Falls back to 'threading' for local dev (python app.py)
-async_mode = 'eventlet' if os.environ.get('RAILWAY_ENVIRONMENT') else 'threading'
-socketio = SocketIO(cors_allowed_origins="*", async_mode=async_mode, message_queue=None)
+# Socket.IO instance
+socketio = SocketIO(cors_allowed_origins="*", async_mode='threading', message_queue=None)
 # Mongo globals (lazy initialized)
 mongo_client = None
 mongo_db = None

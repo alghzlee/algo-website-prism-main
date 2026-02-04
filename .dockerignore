@@ -17,21 +17,6 @@ __pycache__/
 *.egg-info/
 *.egg
 
-# Model Files - CRITICAL: Ignore ALL model data files
-# Models will be downloaded at runtime from Hugging Face
-app/data/best_agent_ensemble.pt
-app/data/best_ae_mimic.pth
-app/data/best_bc_mimic.pth
-app/data/agent_actionsb.npy
-app/data/phys_actionsb.npy
-app/data/phys_bQ.npy
-app/data/.cache/
-
-# Alternative: use wildcards (but less explicit)
-# app/data/*.pt
-# app/data/*.pth  
-# app/data/*.npy
-
 # Node.js (only node_modules, NOT package.json/tailwind for CSS build)
 node_modules/
 

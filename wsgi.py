@@ -1,15 +1,6 @@
 from app import create_app
 from app.extensions import socketio
 import os
-import subprocess
-
-# Download models on first startup (Railway runtime)
-print("Checking model files...")
-try:
-    subprocess.run(["python", "download_models.py"], check=True)
-    print("Model files ready!")
-except Exception as e:
-    print(f"Warning: Model download issue: {e}")
 
 app = create_app()
 
