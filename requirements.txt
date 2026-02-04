@@ -37,10 +37,9 @@ pytz==2024.2
 tzdata==2025.1
 six==1.17.0
 
-# --- ML/AI (CPU-only PyTorch - MUCH smaller!) ---
-# --extra-index-url https://download.pytorch.org/whl/cpu
-# torch==2.6.0+cpu
-torch==2.6.0
+# --- ML/AI (CPU-only PyTorch - CRITICAL for small image size!) ---
+# MUST install torch FIRST from CPU-only index to avoid CUDA version
+# Install separately: pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 
 # --- Model Storage ---
 huggingface_hub==0.28.1

@@ -25,8 +25,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # Install Python dependencies
+# CRITICAL: Install torch CPU-only FIRST to avoid CUDA version (4GB)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
+RUN pip install --no-cache-dir torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt && \
     rm -rf /root/.cache/pip
 
 # Copy application code (model files excluded via .dockerignore)
