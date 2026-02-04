@@ -36,10 +36,7 @@ COPY config.py app.py wsgi.py download_models.py ./
 # Copy built CSS from previous stage
 COPY --from=css-builder /build/app/static/src/css/output.css ./app/static/src/css/output.css
 
-# Download model files from Hugging Face (only during build)
-RUN python download_models.py || echo "WARNING: Model download failed"
-
-# Clean up unnecessary files
+# Clean up unnecessary files to reduce image size
 RUN find /app -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
     find /app -type f -name "*.pyc" -delete && \
     rm -rf /tmp/* /var/tmp/*
