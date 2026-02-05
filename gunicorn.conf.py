@@ -27,7 +27,7 @@ access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
 proc_name = 'prism-api'
 
 # Server Mechanics
-preload_app = True  # CRITICAL: Preload app to load models ONCE before worker fork
+preload_app = False  # Let each worker initialize independently after healthcheck
 reload = False
 daemon = False
 
@@ -39,7 +39,7 @@ limit_request_field_size = 8190
 # Directory
 chdir = '/app'
 
-# Environment Check Hook
+# Hooks
 def on_starting(server):
     """Print environment configuration on Gunicorn startup"""
     print("=" * 50)
@@ -51,3 +51,29 @@ def on_starting(server):
     print(f"DB_NAME: {'SET' if os.getenv('DBNAME') else 'MISSING'}")
     print(f"PORT: {os.getenv('PORT', '5001')}")
     print("=" * 50)
+
+def post_worker_init(worker):
+    """Load ML models AFTER worker is ready to serve healthcheck"""
+    import time
+    import threading
+    
+    def delayed_model_load():
+        try:
+            # Wait for healthcheck to pass first
+            time.sleep(5)
+            print(f"[Worker {worker.pid}] Starting model preload...")
+            
+            # Import inside function to avoid loading at master process
+            from app.routes.predict import get_model, get_physpol
+            
+            get_model()      # SAC Ensemble (122MB)
+            get_physpol()    # Physician policy
+            
+            print(f"[Worker {worker.pid}] ✓ Models preloaded and cached!")
+        except Exception as e:
+            print(f"[Worker {worker.pid}] Model preload failed (will lazy-load): {e}")
+    
+    # Start in background thread
+    thread = threading.Thread(target=delayed_model_load, daemon=True)
+    thread.start()
+    print(f"[Worker {worker.pid}] Model preloading scheduled (background)")

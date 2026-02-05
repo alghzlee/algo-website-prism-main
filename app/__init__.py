@@ -58,25 +58,9 @@ def create_app():
     def health_check():
         return {'status': 'ok', 'service': 'prism-api'}, 200
     
-    # PRELOAD ML MODELS - Dengan preload_app=True, models di-load di master process
-    # Ini menghindari loading ulang setiap kali worker restart (timeout issue)
-    # Model akan di-share ke semua worker via fork (copy-on-write)
-    print("[Startup] Preloading ML models (master process)...")
-    
-    try:
-        from .routes.predict import get_model, get_physpol
-        
-        # Load models SYNCHRONOUSLY di master process
-        print("[Startup] Loading SAC Ensemble (121.9 MB)...")
-        get_model()      # SAC Ensemble (122MB)
-        print("[Startup] Loading Physician Policy...")
-        get_physpol()    # Physician policy
-        
-        print("[Startup] ✓ ML models preloaded - ready to fork workers!")
-        
-    except Exception as e:
-        # Fatal: jika preload gagal, worker juga akan gagal
-        print(f"[Startup] ✗ Model preload FAILED: {e}")
-        raise
+    # MODEL PRELOADING handled by Gunicorn post_worker_init hook
+    # This ensures healthcheck can respond BEFORE model loading starts
+    # See gunicorn.conf.py -> post_worker_init()
+    print("[App Factory] Model loading will be triggered by worker (see gunicorn hooks)")
     
     return app
